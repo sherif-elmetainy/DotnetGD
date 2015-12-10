@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if WEBP
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -68,4 +69,4 @@ namespace DotnetGD.Formatters
     }
 }
 
-
+#endif

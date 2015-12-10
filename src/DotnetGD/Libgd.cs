@@ -100,6 +100,7 @@ namespace DotnetGD
             [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
             public static extern GdImage* gdImageCreateFromWBMPPtr(int size, IntPtr data);
 
+#if WEBP
             // Webp Encoding/Decoding
             [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
             public static extern void gdImageWebpCtx(GdImage* im, GdIoCtx* output, int quantization);
@@ -109,6 +110,7 @@ namespace DotnetGD
             public static extern GdImage* gdImageCreateFromWebpCtx(GdIoCtx* input);
             [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
             public static extern GdImage* gdImageCreateFromWebpPtr(int size, IntPtr data);
+#endif
         }
 
 
