@@ -5,8 +5,7 @@ namespace DotnetGD
     public struct Color : IEquatable<Color>
     {
         private const byte AlphaOpaque = 0xff;
-        private const byte AlphaTransparent = 0;
-
+        
         public byte A => (byte) ((Argb & 0xFF000000) >> 24);
         public byte R => (byte) ((Argb & 0x00FF0000) >> 16);
         public byte G => (byte)((Argb & 0x0000FF00) >> 8);
@@ -46,6 +45,16 @@ namespace DotnetGD
         public override string ToString()
         {
             return $"#{Argb:x8}";
+        }
+
+        public static bool operator ==(Color c1, Color c2)
+        {
+            return c1.Equals(c2);
+        }
+
+        public static bool operator !=(Color c1, Color c2)
+        {
+            return !c1.Equals(c2);
         }
     }
 }

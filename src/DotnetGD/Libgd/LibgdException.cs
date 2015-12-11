@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DotnetGD
+namespace DotnetGD.Libgd
 {
     public class LibgdException : Exception
     {
@@ -12,9 +12,6 @@ namespace DotnetGD
         {
         }
 
-        internal static string GetErrorMessage(string methodName, string message)
-        {
-            return $"LIBGD Error: Method ${methodName} failed: ${message}";
-        }
+        
     }
 }

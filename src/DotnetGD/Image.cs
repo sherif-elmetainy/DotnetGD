@@ -1,10 +1,18 @@
 ﻿using System;
+using System.Threading;
+using DotnetGD.Libgd;
 
 namespace DotnetGD
 {
-    public sealed unsafe class Image : IDisposable
+    public sealed unsafe partial class Image : IDisposable
     {
-        internal Libgd.GdImage* GdImage;
+        static Image()
+        {
+            NativeWrappers.InitializeLibGd();
+        }
+
+        internal GdImage* ImagePtr;
+        private int _references = 1;
 
         public const int PaletteQuantizationSpeedBestQuality = 1;
         public const int PaletteQuantizationSpeedBestSpeed = 10;
@@ -19,15 +27,17 @@ namespace DotnetGD
                 throw new ArgumentOutOfRangeException(nameof(height), height, $"{nameof(height)} must be greater than zero.");
 
             var trueColor = pixelFormat == PixelFormat.Format32BppArgb;
-            GdImage = trueColor ? Libgd.NativeMethods.gdImageCreateTrueColor(width, height) : Libgd.NativeMethods.gdImageCreate(width, height);
-            if (GdImage == null)
-                throw new LibgdException(LibgdException.GetErrorMessage(trueColor ? nameof(Libgd.NativeMethods.gdImageCreateTrueColor) : nameof(Libgd.NativeMethods.gdImageCreate), "A null image pointer was returned."));
+            ImagePtr = trueColor ? NativeWrappers.gdImageCreateTrueColor(width, height) : NativeWrappers.gdImageCreate(width, height);
+            if (!trueColor)
+            {
+                ResolveColor(new Color(0, 0, 0));
+            }
         }
 
-        internal Image(Libgd.GdImage* imagePtr)
+        internal Image(GdImage* imagePtrPtr)
         {
-            if (imagePtr == null) throw new ArgumentNullException(nameof(imagePtr));
-            GdImage = imagePtr;
+            if (imagePtrPtr == null) throw new ArgumentNullException(nameof(imagePtrPtr));
+            ImagePtr = imagePtrPtr;
         }
 
         ~Image()
@@ -35,17 +45,17 @@ namespace DotnetGD
             Dispose(false);
         }
 
-        public ImageCompareResult CompareTo(Image other)
+        internal void AddReference()
         {
-            if (other == null)
-                throw new ArgumentNullException(nameof(other));
-            return Libgd.NativeMethods.gdImageCompare(GdImage, other.GdImage);
+            Interlocked.Increment(ref _references);
         }
+
+        
 
         private void CheckObjectDisposed()
         {
-            if (GdImage == null)
-                throw new ObjectDisposedException(nameof(Libgd.GdImage));
+            if (ImagePtr == null)
+                throw new ObjectDisposedException(nameof(GdImage));
         }
 
         public int Width
@@ -53,7 +63,7 @@ namespace DotnetGD
             get
             {
                 CheckObjectDisposed();
-                return (*GdImage).Width;
+                return ImagePtr->Width;
             }
         }
 
@@ -62,7 +72,7 @@ namespace DotnetGD
             get
             {
                 CheckObjectDisposed();
-                return (*GdImage).Height;
+                return ImagePtr->Height;
             }
         }
 
@@ -71,7 +81,7 @@ namespace DotnetGD
             get
             {
                 CheckObjectDisposed();
-                return (*GdImage).TrueColor == 1 ? PixelFormat.Format32BppArgb : PixelFormat.Format8BppIndexed;
+                return ImagePtr->TrueColor == 1 ? PixelFormat.Format32BppArgb : PixelFormat.Format8BppIndexed;
             }
         }
 
@@ -80,14 +90,14 @@ namespace DotnetGD
             get
             {
                 CheckObjectDisposed();
-                return (*GdImage).ResolutionX;
+                return ImagePtr->ResolutionX;
             }
             set
             {
                 CheckObjectDisposed();
                 if (value == 0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, $"{nameof(ResolutionY)} cannot be zero.");
-                (*GdImage).ResolutionX = value;
+                ImagePtr->ResolutionX = value;
             }
         }
 
@@ -96,14 +106,14 @@ namespace DotnetGD
             get
             {
                 CheckObjectDisposed();
-                return (*GdImage).ResolutionY;
+                return ImagePtr->ResolutionY;
             }
             set
             {
                 CheckObjectDisposed();
                 if (value == 0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, $"{nameof(ResolutionY)} cannot be zero.");
-                (*GdImage).ResolutionY = value;
+                ImagePtr->ResolutionY = value;
             }
         }
 
@@ -112,14 +122,14 @@ namespace DotnetGD
             get
             {
                 CheckObjectDisposed();
-                return (*GdImage).InterpolationId;
+                return ImagePtr->InterpolationId;
             }
             set
             {
                 CheckObjectDisposed();
                 if (value < InterpolationMethod.Default || value >= InterpolationMethod.Invalid)
                     throw new ArgumentOutOfRangeException(nameof(value), value, $"Invalid value for {nameof(InterpolationMethod)}.");
-                (*GdImage).InterpolationId = value;
+                ImagePtr->InterpolationId = value;
             }
         }
 
@@ -128,8 +138,8 @@ namespace DotnetGD
             get
             {
                 CheckObjectDisposed();
-                var p1 = new Point((*GdImage).ClipX1, (*GdImage).ClipY1);
-                var p2 = new Point((*GdImage).ClipX2, (*GdImage).ClipY2);
+                var p1 = new Point(ImagePtr->ClipX1, ImagePtr->ClipY1);
+                var p2 = new Point(ImagePtr->ClipX2, ImagePtr->ClipY2);
                 return new Rectangle(p1, p2);
             }
             set
@@ -153,48 +163,19 @@ namespace DotnetGD
                 if (value.Bottom >= Height)
                     throw new ArgumentOutOfRangeException(nameof(value), value, $"{nameof(ClipRectangle)}.{nameof(ClipRectangle.Bottom)} must be less than {nameof(Height)} which is {Height}.");
 
-                Libgd.NativeMethods.gdImageSetClip(GdImage, value.Left, value.Top, value.Right, value.Bottom);
+                NativeWrappers.gdImageSetClip(ImagePtr, value.Left, value.Top, value.Right, value.Bottom);
             }
         }
-
-        public void DrawRecangle(Rectangle rectangle, Color color)
-        {
-            var resolvedColor = ResolveColor(color);
-            Libgd.NativeMethods.gdImageRectangle(GdImage, rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom, resolvedColor);
-        }
-
-        public void DrawFilledRecangle(Rectangle rectangle, Color color)
-        {
-            var resolvedColor = ResolveColor(color);
-            Libgd.NativeMethods.gdImageFilledRectangle(GdImage, rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom, resolvedColor);
-        }
-
-        public void DrawEllipse(Rectangle rectangle, Color color)
-        {
-            var resolvedColor = ResolveColor(color);
-            Libgd.NativeMethods.gdImageEllipse(GdImage, rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height, resolvedColor);
-        }
-
-        public void DrawFilledEllipse(Rectangle rectangle, Color color)
-        {
-            var resolvedColor = ResolveColor(color);
-            Libgd.NativeMethods.gdImageFilledEllipse(GdImage, rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height, resolvedColor);
-        }
-
-        private int ResolveColor(Color color)
-        {
-            var res = Libgd.NativeMethods.gdImageColorResolveAlpha(GdImage, color.R, color.G, color.B, (255 - color.A) / 2);
-            if (res < 0)
-                throw new LibgdException(LibgdException.GetErrorMessage(nameof(Libgd.NativeMethods.gdImageColorResolveAlpha), $"Resolve color '{color}' returned {res}."));
-            return res;
-        }
-
+        
         private void Dispose(bool isDisposing)
         {
-            var image = GdImage;
+            var image = ImagePtr;
             if (image == null) return;
-            Libgd.NativeMethods.gdImageDestroy(image);
-            GdImage = null;
+            NativeWrappers.gdImageDestroy(image);
+            ImagePtr = null;
+            _pen = null;
+            _brush?.Dispose();
+            _tile?.Dispose();
             if (isDisposing)
             {
                 GC.SuppressFinalize(this);
@@ -203,7 +184,10 @@ namespace DotnetGD
 
         public void Dispose()
         {
-            Dispose(true);
+            if (Interlocked.Decrement(ref _references) <= 0)
+            {
+                Dispose(true);
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using DotnetGD.Libgd;
 
 namespace DotnetGD.Formatters
 {
@@ -33,24 +34,24 @@ namespace DotnetGD.Formatters
             }
         }
 
-        internal override unsafe void WriteImageToGdIoCtx(Libgd.GdImage* imgPtr, Libgd.GdIoCtx* ctx)
+        internal override unsafe void WriteImageToGdIoCtx(GdImage* imgPtr, GdIoCtx* ctx)
         {
-            Libgd.NativeMethods.gdImagePngCtxEx(imgPtr, ctx, CompressionLevel);
+            NativeWrappers.gdImagePngCtxEx(imgPtr, ctx, CompressionLevel);
         }
 
-        internal override unsafe IntPtr ImageToPtr(Libgd.GdImage* img, out int size)
+        internal override unsafe IntPtr ImageToPtr(GdImage* img, out int size)
         {
-            return Libgd.NativeMethods.gdImagePngPtrEx(img, out size, CompressionLevel);
+            return NativeWrappers.gdImagePngPtrEx(img, out size, CompressionLevel);
         }
 
-        internal override unsafe Libgd.GdImage* ImageCreateFromCtx(Libgd.GdIoCtx* ctx)
+        internal override unsafe GdImage* ImageCreateFromCtx(GdIoCtx* ctx)
         {
-            return Libgd.NativeMethods.gdImageCreateFromPngCtx(ctx);
+            return NativeWrappers.gdImageCreateFromPngCtx(ctx);
         }
 
-        internal override unsafe Libgd.GdImage* ImageCreateFromPtr(int size, IntPtr ptr)
+        internal override unsafe GdImage* ImageCreateFromPtr(int size, IntPtr ptr)
         {
-            return Libgd.NativeMethods.gdImageCreateFromPngPtr(size, ptr);
+            return NativeWrappers.gdImageCreateFromPngPtr(size, ptr);
         }
 
         private static readonly IReadOnlyList<string> SupportedExtensionsList = new ReadOnlyCollection<string>(

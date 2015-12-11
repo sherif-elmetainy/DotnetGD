@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using DotnetGD.Libgd;
 
 namespace DotnetGD.Formatters
 {
@@ -27,7 +28,7 @@ namespace DotnetGD.Formatters
             }
         }
 
-        internal abstract unsafe void WriteImageToGdIoCtx(Libgd.GdImage* imgPtr, Libgd.GdIoCtx* ctx);
+        internal abstract unsafe void WriteImageToGdIoCtx(GdImage* imgPtr, GdIoCtx* ctx);
 
 
         public virtual unsafe void WriteImageToStream(Image image, Stream stream)
@@ -36,10 +37,10 @@ namespace DotnetGD.Formatters
             if (stream == null) throw new ArgumentNullException(nameof(stream));
             if (!stream.CanWrite)
                 throw new ArgumentException("Stream must be writeable.", nameof(stream));
-            var io = new Libgd.GdIoCtx(stream);
+            var io = new GdIoCtx(stream);
             try
             {
-                WriteImageToGdIoCtx(image.GdImage, &io);
+                WriteImageToGdIoCtx(image.ImagePtr, &io);
             }
             finally
             {
@@ -55,26 +56,22 @@ namespace DotnetGD.Formatters
                 throw new ArgumentException("Stream must be writeable.", nameof(stream));
             return Task.Run(() => WriteImageToStream(image, stream));
         }
-        internal abstract unsafe IntPtr ImageToPtr(Libgd.GdImage* img, out int size);
+        internal abstract unsafe IntPtr ImageToPtr(GdImage* img, out int size);
 
         public virtual unsafe byte[] EncodeImage(Image image)
         {
             if (image == null) throw new ArgumentNullException(nameof(image));
             int size;
-            var res = ImageToPtr(image.GdImage, out size);
-            if (res == null)
-                throw new LibgdException(LibgdException.GetErrorMessage(nameof(Libgd.NativeMethods.gdImagePngPtrEx), "Method returned null."));
+            var res = ImageToPtr(image.ImagePtr, out size);
             try
             {
-                if (size <= 0)
-                    throw new LibgdException(LibgdException.GetErrorMessage(nameof(Libgd.NativeMethods.gdImagePngPtrEx), "Non-positive side returned."));
                 var managedBytes = new byte[size];
                 Marshal.Copy(res, managedBytes, 0, size);
                 return managedBytes;
             }
             finally
             {
-                Libgd.NativeMethods.gdFree(res);
+                NativeWrappers.gdFree(res);
             }
         }
 
@@ -95,7 +92,7 @@ namespace DotnetGD.Formatters
             }
         }
 
-        internal abstract unsafe Libgd.GdImage* ImageCreateFromCtx(Libgd.GdIoCtx* ctx);
+        internal abstract unsafe GdImage* ImageCreateFromCtx(GdIoCtx* ctx);
 
 
         public virtual unsafe Image ReadImageFromStream(Stream stream)
@@ -104,12 +101,10 @@ namespace DotnetGD.Formatters
             if (!stream.CanRead)
                 throw new ArgumentException("Stream must be readable.", nameof(stream));
 
-            var io = new Libgd.GdIoCtx(stream);
+            var io = new GdIoCtx(stream);
             try
             {
                 var res = ImageCreateFromCtx(&io);
-                if (res == null)
-                    throw new LibgdException(LibgdException.GetErrorMessage(nameof(Libgd.NativeMethods.gdImageCreateFromPngCtx), "Method returned null."));
                 return new Image(res);
             }
             finally
@@ -124,7 +119,7 @@ namespace DotnetGD.Formatters
             return Task.Run(() => ReadImageFromStream(stream));
         }
 
-        internal abstract unsafe Libgd.GdImage* ImageCreateFromPtr(int size, IntPtr ptr);
+        internal abstract unsafe GdImage* ImageCreateFromPtr(int size, IntPtr ptr);
 
         public virtual unsafe Image DecodeImage(byte[] byteArray)
         {
@@ -135,8 +130,6 @@ namespace DotnetGD.Formatters
             {
                 Marshal.Copy(byteArray, 0, ptr, byteArray.Length);
                 var res = ImageCreateFromPtr(byteArray.Length, ptr);
-                if (res == null)
-                    throw new LibgdException(LibgdException.GetErrorMessage(nameof(Libgd.NativeMethods.gdImageCreateFromPngCtx), "Method returned null."));
                 return new Image(res);
             }
             finally

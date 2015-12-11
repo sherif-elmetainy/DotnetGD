@@ -5,38 +5,38 @@ using DotnetGD.Libgd;
 
 namespace DotnetGD.Formatters
 {
-    public class WbmpImageFormatter : BaseImageFormatter
-    {   
+    public class TiffImageFormatter : BaseImageFormatter
+    {
         internal override unsafe void WriteImageToGdIoCtx(GdImage* imgPtr, GdIoCtx* ctx)
         {
-            NativeWrappers.gdImageWBMPCtx(imgPtr, 0, ctx);
+            NativeWrappers.gdImageTiffCtx(imgPtr, ctx);
         }
 
         internal override unsafe IntPtr ImageToPtr(GdImage* img, out int size)
         {
-            return NativeWrappers.gdImageWBMPPtr(img, out size, 0);
+            return NativeWrappers.gdImageTiffPtr(img, out size);
         }
 
         internal override unsafe GdImage* ImageCreateFromCtx(GdIoCtx* ctx)
         {
-            return NativeWrappers.gdImageCreateFromWBMPCtx(ctx);
+            return NativeWrappers.gdImageCreateFromTiffCtx(ctx);
         }
 
         internal override unsafe GdImage* ImageCreateFromPtr(int size, IntPtr ptr)
         {
-            return NativeWrappers.gdImageCreateFromWBMPPtr(size, ptr);
+            return NativeWrappers.gdImageCreateFromTiffPtr(size, ptr);
         }
 
         private static readonly IReadOnlyList<string> SupportedExtensionsList = new ReadOnlyCollection<string>(
                 new []
                 {
-                    "wbmp"
+                    "tiff", "tif"
                 }
             );
 
         public override IReadOnlyList<string> SupportedExtensions => SupportedExtensionsList;
 
-        public override string MimeType => "image/vnd.wap.wbmp";
+        public override string MimeType => "image/tiff";
 
         public override bool IsLossy => false;
     }

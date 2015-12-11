@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using DotnetGD;
 using DotnetGD.Formatters;
+using DotnetGD.Libgd;
 using Xunit;
 using Xunit.Sdk;
 
@@ -19,7 +20,8 @@ namespace DotnetGDTests
         /// <summary>
         /// Attribute to get the formats data
         /// </summary>
-        private class ImageFormmatersDataAttribute : DataAttribute
+        [AttributeUsage(AttributeTargets.Method)]
+        private class ImageFormattersDataAttribute : DataAttribute
         {
             private static readonly Action<IImageFormatter>[] NullTestActions = {
                 DecodeNullImage,
@@ -53,6 +55,13 @@ namespace DotnetGDTests
                 switch (testMethod.Name)
                 {
                     case nameof(TestFormattererImage2Image):
+                        foreach (var type in types)
+                        {
+                            yield return new object[] { type, PixelFormat.Format32BppArgb };
+                            yield return new object[] { type, PixelFormat.Format8BppIndexed };
+                        }
+                        break;
+                    case nameof(TestEmptyStream):
                         foreach (var type in types)
                         {
                             yield return new object[] { type };
@@ -170,25 +179,29 @@ namespace DotnetGDTests
             }
         }
 
-        /// <summary>
-        /// test reading and writing images
-        /// </summary>
-        /// <param name="formatterType"></param>
+        public static bool AreImagesSimilar(Image im1, Image im2, int threshold)
+        {
+            var res = Image.CompareImages(im1, im2);
+            if (res == ImageCompareResult.Similar)
+                return true;
+            return !res.HasFlag(ImageCompareResult.DifferentSize);
+        }
+        
         [Theory]
-        [ImageFormmatersData]
-        public void TestFormattererImage2Image(Type formatterType)
+        [ImageFormattersData]
+        public void TestFormattererImage2Image(Type formatterType, PixelFormat pixelFormat)
         {
             var formatter = (IImageFormatter)Activator.CreateInstance(formatterType);
             if (!formatter.CanEncode) return;
-            using (var image = new Image(100, 100))
+            using (var image = new Image(100, 100, pixelFormat))
             {
                 var red = new Color(0xff, 0, 0);
                 var green = new Color(0, 0xff, 0);
                 var blue = new Color(0, 0, 0xff);
 
-                image.DrawFilledRecangle(new Rectangle(0, 0, 99, 99), red);
-                image.DrawRecangle(new Rectangle(20, 20, 59, 59), green);
-                image.DrawEllipse(new Rectangle(70, 25, 30, 20), blue);
+                image.DrawFilledRectangle(new Rectangle(0, 0, 99, 99), red);
+                image.DrawRectangle(new Rectangle(20, 20, 59, 59), green);
+                image.DrawEllipse(new Point(70, 25), new Size(30, 20), blue);
 
                 var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n") + "." + formatter.DefaultExtension);
                 try
@@ -198,19 +211,15 @@ namespace DotnetGDTests
 
                     if (!formatter.CanDecode) return;
 
-                    const ImageCompareResult expectedDifference = ImageCompareResult.Image | ImageCompareResult.Color
-                                                                  | ImageCompareResult.TrueColor | ImageCompareResult.TransparentColor | ImageCompareResult.NumberOfColors;
-
-
                     using (var decoded = formatter.DecodeImage(encoded))
                     {
-                        var result = image.CompareTo(decoded);
-                        Assert.Equal(ImageCompareResult.Similar, result & (~expectedDifference));
+                        var result = AreImagesSimilar(decoded, image, 128);
+                        Assert.True(result);
                     }
                     using (var decoded = formatter.ReadImageFromFile(path))
                     {
-                        var result = image.CompareTo(decoded);
-                        Assert.Equal(ImageCompareResult.Similar, result & (~expectedDifference));
+                        var result = AreImagesSimilar(decoded, image, 128);
+                        Assert.True(result);
                     }
                 }
                 finally
@@ -227,7 +236,7 @@ namespace DotnetGDTests
         /// <param name="formatterType"></param>
         /// <param name="action"></param>
         [Theory]
-        [ImageFormmatersData]
+        [ImageFormattersData]
         public void TestNullParameters(Type formatterType, Action<IImageFormatter> action)
         {
             var formatter = (IImageFormatter)Activator.CreateInstance(formatterType);
@@ -244,7 +253,7 @@ namespace DotnetGDTests
         /// <param name="func"></param>
         /// <returns></returns>
         [Theory]
-        [ImageFormmatersData]
+        [ImageFormattersData]
         public async Task TestNullParametersAsync(Type formatterType, Func<IImageFormatter, Task> func)
         {
             var formatter = (IImageFormatter)Activator.CreateInstance(formatterType);
@@ -252,6 +261,70 @@ namespace DotnetGDTests
             {
                 await func(formatter);
             });
+        }
+
+        [Theory]
+        [ImageFormattersData]
+        public void TestEmptyStream(Type formatterType)
+        {
+            var formatter = (IImageFormatter)Activator.CreateInstance(formatterType);
+
+            Assert.Throws<LibgdException>(() =>
+            {
+                using (var ms = new MemoryStream())
+                {
+                    using (formatter.ReadImageFromStream(ms))
+                    {
+
+                    }
+                }
+            });
+        }
+
+        [Fact]
+        public void TestAnimatedGif()
+        {
+            var gif = new GifImageFormatter();
+
+            using (var image = new Image(100, 100, PixelFormat.Format8BppIndexed))
+            {
+                var red = new Color(0xff, 0, 0);
+                var green = new Color(0, 0xff, 0);
+                var blue = new Color(0, 0, 0xff);
+
+                image.DrawFilledRectangle(new Rectangle(0, 0, 99, 99), red);
+                image.DrawRectangle(new Rectangle(20, 20, 59, 59), green);
+                image.DrawEllipse(new Point(70, 25), new Size(30, 20), blue);
+                var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n") + "." + gif.DefaultExtension);
+                try
+                {
+                    using (var fs = File.Create(path))
+                    {
+                        using (var context = gif.BeginAnimation(image, fs, true, -1))
+                        {
+
+                            for (var i = 0; i < 10; i++)
+                            {
+                                using (var addedImage = new Image(image.Width, image.Height, PixelFormat.Format8BppIndexed))
+                                {
+                                    addedImage.DrawFilledRectangle(new Rectangle(0, 0, 99, 99), red);
+                                    addedImage.DrawRectangle(new Rectangle(21 + i, 20 + i, 59, 59), green);
+                                    addedImage.DrawEllipse(new Point(70 - i, 25 + i), new Size(30 + i, 20), blue);
+                                    context.AddImage(addedImage, false, 0, 0, 20, 0);
+                                }
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    if (File.Exists(path))
+                        File.Delete(path);
+                }
+                
+                
+            }
+                
         }
     }
 }

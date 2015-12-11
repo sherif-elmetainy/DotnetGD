@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using DotnetGD.Libgd;
 
 namespace DotnetGD.Formatters
 {
@@ -34,24 +35,24 @@ namespace DotnetGD.Formatters
             }
         }
 
-        internal override unsafe void WriteImageToGdIoCtx(Libgd.GdImage* imgPtr, Libgd.GdIoCtx* ctx)
+        internal override unsafe void WriteImageToGdIoCtx(GdImage* imgPtr, GdIoCtx* ctx)
         {
-            Libgd.NativeMethods.gdImageWebpCtx(imgPtr, ctx, Quality);
+            NativeMethods.gdImageWebpCtx(imgPtr, ctx, Quality);
         }
 
-        internal override unsafe IntPtr ImageToPtr(Libgd.GdImage* img, out int size)
+        internal override unsafe IntPtr ImageToPtr(GdImage* img, out int size)
         {
-            return Libgd.NativeMethods.gdImageWebpPtrEx(img, out size, Quality);
+            return NativeMethods.gdImageWebpPtrEx(img, out size, Quality);
         }
 
-        internal override unsafe Libgd.GdImage* ImageCreateFromCtx(Libgd.GdIoCtx* ctx)
+        internal override unsafe GdImage* ImageCreateFromCtx(GdIoCtx* ctx)
         {
-            return Libgd.NativeMethods.gdImageCreateFromWebpCtx(ctx);
+            return NativeMethods.gdImageCreateFromWebpCtx(ctx);
         }
 
-        internal override unsafe Libgd.GdImage* ImageCreateFromPtr(int size, IntPtr ptr)
+        internal override unsafe GdImage* ImageCreateFromPtr(int size, IntPtr ptr)
         {
-            return Libgd.NativeMethods.gdImageCreateFromWebpPtr(size, ptr);
+            return NativeMethods.gdImageCreateFromWebpPtr(size, ptr);
         }
 
         private static readonly IReadOnlyList<string> SupportedExtensionsList = new ReadOnlyCollection<string>(

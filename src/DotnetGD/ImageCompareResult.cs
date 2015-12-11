@@ -14,6 +14,9 @@ namespace DotnetGD
         TransparentColor = 32,
         Background = 64,
         Interlace = 128,
-        TrueColor = 256
+        TrueColor = 256,
+        FormattingLoss = Image | NumberOfColors | Color | TransparentColor | Background | TrueColor | Interlace,
+        DifferentSize = Width | Height,
+        All = Image | NumberOfColors | Color | Width | Height | TransparentColor | Background | Interlace | TrueColor
     }
 }

@@ -1,29 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using DotnetGD.Libgd;
 
 namespace DotnetGD.Formatters
 {
-    public class GifImageFormatter : BaseImageFormatter
+    public class GifImageFormatter : BaseImageFormatter, IAnimatedImageFormatter
     {
-        internal override unsafe void WriteImageToGdIoCtx(Libgd.GdImage* imgPtr, Libgd.GdIoCtx* ctx)
+        internal override unsafe void WriteImageToGdIoCtx(GdImage* imgPtr, GdIoCtx* ctx)
         {
-            Libgd.NativeMethods.gdImageGifCtx(imgPtr, ctx);
+            NativeWrappers.gdImageGifCtx(imgPtr, ctx);
         }
 
-        internal override unsafe IntPtr ImageToPtr(Libgd.GdImage* img, out int size)
+        internal override unsafe IntPtr ImageToPtr(GdImage* img, out int size)
         {
-            return Libgd.NativeMethods.gdImageGifPtr(img, out size);
+            return NativeWrappers.gdImageGifPtr(img, out size);
         }
 
-        internal override unsafe Libgd.GdImage* ImageCreateFromCtx(Libgd.GdIoCtx* ctx)
+        internal override unsafe GdImage* ImageCreateFromCtx(GdIoCtx* ctx)
         {
-            return Libgd.NativeMethods.gdImageCreateFromGifCtx(ctx);
+            return NativeWrappers.gdImageCreateFromGifCtx(ctx);
         }
 
-        internal override unsafe Libgd.GdImage* ImageCreateFromPtr(int size, IntPtr ptr)
+        internal override unsafe GdImage* ImageCreateFromPtr(int size, IntPtr ptr)
         {
-            return Libgd.NativeMethods.gdImageCreateFromGifPtr(size, ptr);
+            return NativeWrappers.gdImageCreateFromGifPtr(size, ptr);
         }
 
         private static readonly IReadOnlyList<string> SupportedExtensionsList = new ReadOnlyCollection<string>(
@@ -38,5 +40,12 @@ namespace DotnetGD.Formatters
         public override string MimeType => "image/gif";
 
         public override bool IsLossy => false;
+
+        public override bool SupportsAnimation => true;
+
+        public IAnimationContext BeginAnimation(Image image, Stream outStream, bool globalColorMap, int loops)
+        {
+            return new GifAnimationContext(outStream, image, globalColorMap, loops);
+        }
     }
 }

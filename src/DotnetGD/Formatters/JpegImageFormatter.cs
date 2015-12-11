@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using DotnetGD.Libgd;
 
 namespace DotnetGD.Formatters
 {
@@ -9,7 +10,7 @@ namespace DotnetGD.Formatters
         private int _quality;
         public const int QualityUgly = 0;
         public const int QualityBest = 100;
-        public const int QualityDefault = 50;
+        public const int QualityDefault = QualityBest;
 
         public JpegImageFormatter() : this(QualityDefault)
         {
@@ -33,24 +34,24 @@ namespace DotnetGD.Formatters
             }
         }
 
-        internal override unsafe void WriteImageToGdIoCtx(Libgd.GdImage* imgPtr, Libgd.GdIoCtx* ctx)
+        internal override unsafe void WriteImageToGdIoCtx(GdImage* imgPtr, GdIoCtx* ctx)
         {
-            Libgd.NativeMethods.gdImageJpegCtx(imgPtr, ctx, Quality);
+            NativeWrappers.gdImageJpegCtx(imgPtr, ctx, Quality);
         }
 
-        internal override unsafe IntPtr ImageToPtr(Libgd.GdImage* img, out int size)
+        internal override unsafe IntPtr ImageToPtr(GdImage* img, out int size)
         {
-            return Libgd.NativeMethods.gdImageJpegPtr(img, out size, Quality);
+            return NativeWrappers.gdImageJpegPtr(img, out size, Quality);
         }
 
-        internal override unsafe Libgd.GdImage* ImageCreateFromCtx(Libgd.GdIoCtx* ctx)
+        internal override unsafe GdImage* ImageCreateFromCtx(GdIoCtx* ctx)
         {
-            return Libgd.NativeMethods.gdImageCreateFromJpegCtxEx(ctx, 1);
+            return NativeWrappers.gdImageCreateFromJpegCtxEx(ctx, 1);
         }
 
-        internal override unsafe Libgd.GdImage* ImageCreateFromPtr(int size, IntPtr ptr)
+        internal override unsafe GdImage* ImageCreateFromPtr(int size, IntPtr ptr)
         {
-            return Libgd.NativeMethods.gdImageCreateFromJpegPtrEx(size, ptr, 1);
+            return NativeWrappers.gdImageCreateFromJpegPtrEx(size, ptr, 1);
         }
 
         private static readonly IReadOnlyList<string> SupportedExtensionsList = new ReadOnlyCollection<string>(
