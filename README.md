@@ -1,7 +1,7 @@
 # CodeArt.DotnetGD
 
 ## About
-Dotnet GD is an open source managed wrapper around [libdg](https://github.com/libgd/libgd) designed to work with ASP.NET 5 using either .NET Framework 4.51 (DNX451) or .NET Core 5.0 (DNXCORE50). The library is still a work in progress and a lot of functions supported by libgd are still not exposed. It is intended as a replacement for System.Drawing for projects targetting ASP.NET 5.
+Dotnet GD is an open source managed wrapper around [libgd](https://github.com/libgd/libgd) designed to work with ASP.NET 5 using either .NET Framework 4.51 (DNX451) or .NET Core 5.0 (DNXCORE50). The library is still a work in progress and a lot of functions supported by libgd are still not exposed. It is intended as a replacement for System.Drawing for projects targetting ASP.NET 5.
 
 ## The currently implemented features are:
 
