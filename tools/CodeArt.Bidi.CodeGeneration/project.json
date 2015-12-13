@@ -1,11 +1,11 @@
 ﻿{
-  "version": "1.0.0-*",
-  "description": "CodeArt.Bidi.CodeGeneration Console Application",
-  "authors": [ "Sherif" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
-
+  "version": "1.0.0-alpha1",
+  "description": "A file generation tool to generate unicode data files for CodeArt.Bidi library.",
+  "authors": [ "Sherif Elmetainy (Code Art)" ],
+  "tags": [ "unicode bidi arabic" ],
+  "projectUrl": "https://github.com/sherif-elmetainy/DotnetGD",
+  "licenseUrl": "https://github.com/sherif-elmetainy/DotnetGD/blob/master/LICENSE.txt",
+  "copyright": "Copyright (c) 2015 Sherif Elmetainy (Code Art)",
   "compilationOptions": {
     "emitEntryPoint": true
   },
@@ -29,5 +29,10 @@
         "System.IO.FileSystem": "4.0.1-beta-23516"
       }
     }
-  }
+  },
+  "compileFiles": [
+    "../../src/CodeArt.Bidi/UnicodeDataHelper.cs",
+    "../../src/CodeArt.Bidi/BidiDirection.cs",
+    "../../src/CodeArt.Bidi/BracketType.cs"
+  ]
 }

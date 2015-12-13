@@ -3,6 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace CodeArt.DotnetGD.Libgd
 {
+    /// <summary>
+    /// Libgd native methods
+    /// </summary>
     internal static unsafe class NativeMethods
     {
         private const string LibgdName = "libgd";

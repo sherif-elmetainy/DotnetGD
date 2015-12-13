@@ -9,7 +9,7 @@ namespace CodeArt.Bidi
             OriginalString = str;
             var codes = new List<int>(str.Length);
             var lbs = new List<int>();
-            var types=  new List<BidiCategory>(str.Length);
+            var types=  new List<BidiDirection>(str.Length);
             var bracketsTypes = new List<BracketType>(str.Length);
             var bracketValues = new List<int>(str.Length);
             int numWords;
@@ -22,10 +22,10 @@ namespace CodeArt.Bidi
                     code = UnicodeData.GetUtf32(str, i, out numWords);
                 }
                 codes.Add(code);
-                types.Add(UnicodeData.GetBidiCategory(code));
+                types.Add(UnicodeData.GetDirection(code));
                 var bt = UnicodeData.GetBracketType(code);
                 bracketsTypes.Add(bt);
-                bracketValues.Add(bt == BracketType.Opening ? UnicodeData.GetPairedBracket(code) : code);
+                bracketValues.Add(bt == BracketType.Opening ? UnicodeData.GetMatchingBracket(code) : code);
                 if (code == '\r' || code == '\n')
                     lbs.Add(i);
             }
@@ -39,7 +39,7 @@ namespace CodeArt.Bidi
         }
 
 
-        public BidiCategory[] Types { get; }
+        public BidiDirection[] Types { get; }
 
         public string OriginalString { get; }
 

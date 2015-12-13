@@ -1,6 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Text;
+using CodeArt.Bidi;
 using CodeArt.DotnetGD.Libgd;
+using DotnetGD;
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace CodeArt.DotnetGD
 {
@@ -128,10 +132,55 @@ namespace CodeArt.DotnetGD
         }
         #endregion
 
-        public void DrawString(string text, Point point, string fontName, double fontSize, double angle, Color color)
+        public void DrawString(string text, Point point, string fontName, double fontSize, double angle, Color color, DrawStringFlags flags = DrawStringFlags.Default)
         {
+            text = FormatString(text, flags);
             var utf8 = Encoding.UTF8.GetBytes(text);
-            NativeWrappers.gdImageStringFT(ImagePtr, null, ResolveColor(color), fontName, fontSize, angle, point.X, point.Y, utf8);
+            NativeWrappers.gdImageStringFT(ImagePtr, null, ResolveColor(color), GetFont(fontName), fontSize, angle, point.X, point.Y, utf8);
+        }
+
+        private static string GetFont(string fontName)
+        {
+            if (string.IsNullOrWhiteSpace(fontName))
+                throw new ArgumentNullException(nameof(fontName));
+            if (!Path.IsPathRooted(fontName))
+            {
+                fontName = Path.Combine(PlatformServices.Default.Application.ApplicationBasePath, fontName);
+            }
+            if (!Path.HasExtension(fontName))
+            {
+                fontName = Path.ChangeExtension(fontName, ".ttf");
+            }
+            if (!File.Exists(fontName))
+                throw new FileNotFoundException("Font file was not found.", fontName);
+            return fontName;
+        }
+
+        private static string FormatString(string text, DrawStringFlags flags)
+        {
+            if ((flags & DrawStringFlags.ArabicShaping) != 0)
+            {
+                var options = ArabicShapingOptions.LettersShape
+                              | ArabicShapingOptions.TextDirectionLogical;
+                if ((flags & DrawStringFlags.ShapeArabicNumbers) != 0)
+                {
+                    options |= ArabicShapingOptions.DigitsEN2AN;
+                }
+                if ((flags & DrawStringFlags.RemoveArabicTashkeel) != 0)
+                {
+                    options |= ArabicShapingOptions.TashkeelResize;
+                }
+                var arabicShaping = new ArabicShaping(options);
+                text = arabicShaping.Shape(text);
+            }
+            if ((flags & DrawStringFlags.RunBidi) != 0)
+            {
+                var dir = (flags & DrawStringFlags.IsLtr) != 0
+                    ? ParagraphDirection.Left
+                    : ((flags & DrawStringFlags.IsRtl) != 0 ? ParagraphDirection.Right : ParagraphDirection.Default);
+                text = BidiHelper.FormatString(text, dir);
+            }
+            return text;
         }
 
         private static Color GdTrueColorToColor(int color)

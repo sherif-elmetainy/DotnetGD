@@ -4,8 +4,25 @@ using System.Runtime.InteropServices;
 
 namespace CodeArt.DotnetGD.Libgd
 {
+    /// <summary>
+    /// Wrappers around Libgd native methods
+    /// </summary>
     internal static unsafe class NativeWrappers
     {
+        // Most libgd functions don't return error messages
+        // A lot of the function have a void return type but can still fail
+        // Others can return a null pointer without stating a reason in return.
+        // While this library tries to do some validation before calling libgd functions
+        // Some function can still fail
+        // The default error reporting in libgd would call gd_error which writes to stderr
+        // This can be overriden by calling gdSetErrorMethod function
+        // Normally I would Marshal a pointer to a managed function and have that function throw an exception
+        // However, a closer look at the source code of libgd showed that a this is called before freeing unmanaged memory used by libgd
+        // So having the managed error handle throw an exception would cause unmanaged memory leaks that the GC can't collect.
+        // I also cannot read the error from stderr because it's the same for all threads
+        
+        // As a REALLY UGLY workaround, I have the managed handler write the error message to a thread static variable.
+
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void LibgdErrorCallbackDelegate(
             int priority, [MarshalAs(UnmanagedType.LPStr)] string message);
@@ -13,21 +30,43 @@ namespace CodeArt.DotnetGD.Libgd
         [ThreadStatic]
         private static string _currentError;
 
+        /// <summary>
+        /// Managed error handler. Libgd handler is a c-style variable args function (line printf family of functions). 
+        /// The error message passed is the prinft format string, but I don't know how I can access the C variable arguments
+        /// from managed code.
+        /// So the exception message would have format specifiers like %s or %d rather than actual error paramters. 
+        /// But this is better than having no error message at all.
+        /// The fact that the signature of the method is different from that of the C-decl (the var args argument is missing) is not a problem
+        /// since in C declaration convention the caller is responsible for removing the arguments from the stack 
+        /// </summary>
+        /// <param name="priority"></param>
+        /// <param name="message"></param>
         private static void LibgdErrorCallback(int priority, string message)
         {
             _currentError = message;
         }
 
+        /// <summary>
+        /// Initialize setErrorMethod
+        /// </summary>
         public static void InitializeLibGd()
         {
             NativeMethods.gdSetErrorMethod(Marshal.GetFunctionPointerForDelegate<LibgdErrorCallbackDelegate>(LibgdErrorCallback));
         }
 
+        /// <summary>
+        /// Reset error (this is called before every native call to clear the error message)
+        /// </summary>
         private static void ResetError()
         {
             _currentError = null;
         }
 
+        /// <summary>
+        /// Throw an exception
+        /// </summary>
+        /// <param name="errorMessage"></param>
+        /// <param name="methodName"></param>
         private static void ThrowException(string errorMessage, [CallerMemberName] string methodName = null)
         {
             var error = $"LIBGD Error: Method {methodName} failed: {errorMessage}";
@@ -48,6 +87,7 @@ namespace CodeArt.DotnetGD.Libgd
                 : _currentError;
             if (result != IntPtr.Zero)
             {
+                // Normally we should never get here
                 NativeMethods.gdFree(result);
             }
             ThrowLibgdException(errorMessage, methodName);
@@ -61,6 +101,7 @@ namespace CodeArt.DotnetGD.Libgd
                 : _currentError;
             if (result != null)
             {
+                // Normally we should never get here
                 NativeMethods.gdImageDestroy(result);
             }
             ThrowLibgdException(errorMessage, methodName);

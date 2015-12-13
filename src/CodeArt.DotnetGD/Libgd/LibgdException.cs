@@ -2,6 +2,9 @@
 
 namespace CodeArt.DotnetGD.Libgd
 {
+    /// <summary>
+    /// An error occuring in libgd itself
+    /// </summary>
     public class LibgdException : Exception
     {
         public LibgdException(string message) : base(message)

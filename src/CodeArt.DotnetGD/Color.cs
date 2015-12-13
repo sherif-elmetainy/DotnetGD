@@ -2,6 +2,9 @@
 
 namespace CodeArt.DotnetGD
 {
+    /// <summary>
+    /// Color structure (similar to the one used in System.Drawing)
+    /// </summary>
     public struct Color : IEquatable<Color>
     {
         private const byte AlphaOpaque = 0xff;

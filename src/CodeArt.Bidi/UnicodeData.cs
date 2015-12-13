@@ -1,22 +1,88 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Text;
+using Microsoft.Extensions.PlatformAbstractions;
+using System.Reflection;
 
 namespace CodeArt.Bidi
 {
-    internal partial class UnicodeData
+    public static class UnicodeData
     {
-        private class BracketInfo
-        {
-            public BracketInfo(int pairedBracket, BracketType type)
-            {
-                PairedBracket = pairedBracket;
-                Type = type;
-            }
+        private static readonly Dictionary<int, long> Data = InitializeData();
 
-            public int PairedBracket { get; }
-            public BracketType Type { get; }
+        private static Dictionary<int, long> InitializeData()
+        {
+            var name = typeof(UnicodeData).GetTypeInfo().Assembly.GetName().Name;
+            var library = PlatformServices.Default.LibraryManager.GetLibrary(name);
+            var libraryPath = library.Path;
+            if (string.Equals(library.Type, "Project", StringComparison.OrdinalIgnoreCase))
+            {
+                libraryPath = Path.GetDirectoryName(libraryPath);
+            }
+            else if (string.Equals(library.Type, "Assembly", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException("Cannot load unicod data.");
+            }
+            var dict = new Dictionary<int, long>();
+            Debug.Assert(libraryPath != null, "libraryPath != null");
+            using (var fs = File.OpenRead(Path.Combine(libraryPath, "Data", "Unicode.dat")))
+            {
+                var binaryReader = new BinaryReader(fs);
+                do
+                {
+                    int key;
+                    try
+                    {
+                        key = binaryReader.ReadInt32();
+                    }
+                    catch (EndOfStreamException)
+                    {
+                        break;
+                    }
+                    var val = binaryReader.ReadInt64();
+                    dict.Add(key, val);
+                } while (true);
+            }
+            return dict;
         }
+
+        public static BidiDirection GetDirection(int ch)
+        {
+            long data;
+            Data.TryGetValue(ch, out data);
+            return (BidiDirection)UnicodeDataHelper.GetDirection(data);
+        }
+
+        public static BidiDirection GetDirection(char ch) => GetDirection((int)ch);
+
+        public static BracketType GetBracketType(int ch)
+        {
+            long data;
+            Data.TryGetValue(ch, out data);
+            return (BracketType)UnicodeDataHelper.GetBracketType(data);
+        }
+
+        public static BracketType GetBracketType(char ch) => GetBracketType((int)ch);
+
+        public static int GetMatchingBracket(int ch)
+        {
+            long data;
+            Data.TryGetValue(ch, out data);
+            return data == 0 ? ch : UnicodeDataHelper.GetMatchingBracket(data);
+        }
+
+        public static int GetMatchingBracket(char ch) => GetMatchingBracket((int)ch);
+
+        public static int GetMirror(int ch)
+        {
+            long data;
+            Data.TryGetValue(ch, out data);
+            return data == 0 ? ch : UnicodeDataHelper.GetMirror(data);
+        }
+
+        public static int GetMirror(char ch) => GetMirror((int)ch);
 
         public const int HiSurrogateStart = 0xD800;
         public const int LoSurrogateStart = 0xDC00;
@@ -66,57 +132,6 @@ namespace CodeArt.Bidi
                 wordCount = 1;
                 return str[index];
             }
-        }
-
-        private class BidiCategoryRange
-        {
-            public BidiCategoryRange(int from, int to, BidiCategory category)
-            {
-                From = from;
-                To = to;
-                Category = category;
-
-            }
-
-            public int From { get; }
-
-            public int To { get; }
-
-            public BidiCategory Category { get; }
-        }
-
-
-        public static BracketType GetBracketType(int ch)
-        {
-            BracketInfo info;
-            return BracketData.TryGetValue(ch, out info) ? info.Type : BracketType.None;
-        }
-
-        public static int GetPairedBracket(int ch)
-        {
-            BracketInfo info;
-            return BracketData.TryGetValue(ch, out info) ? info.PairedBracket : ch;
-        }
-
-        public static BidiCategory GetBidiCategory(int ch)
-        {
-            
-            var start = 0;
-            var end = BidiCategories.Count - 1;
-            while (start <= end)
-            {
-                var index = (start + end) / 2;
-                var item = BidiCategories[index];
-                if (ch < item.From)
-                    end = index - 1;
-                else if (ch > item.To)
-                    start = index + 1;
-                else
-                {
-                    return item.Category;
-                }
-            }
-            throw new ArgumentException($"Cannot resolve bidi category for codepoint \\u{ch:x4}.", nameof(ch));
         }
     }
 }

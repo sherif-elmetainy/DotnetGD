@@ -1,42 +1,53 @@
 ﻿using System;
-using CodeArt.DotnetGD;
+using System.IO;
 using CodeArt.DotnetGD.Formatters;
+using DotnetGD;
 using Xunit;
 
 namespace CodeArt.DotnetGD.Tests
 {
     public class DrawTextTests
     {
-        [Fact]
-        public void DrawText()
+        
+        [Theory]
+        [InlineData("Hello world!", "helloworld_en.png", DrawStringFlags.Default)]
+        [InlineData("مرحبا بالعالم!", "helloworld_ar.png", DrawStringFlags.RunBidi | DrawStringFlags.ArabicShaping)]
+        [InlineData("مَرْحَبَاً بِالْعَالَمِ!", "helloworld_tashkeel_ar.png", DrawStringFlags.RunBidi | DrawStringFlags.ArabicShaping)]
+        [InlineData("مَرْحَبَاً بِالْعَالَمِ!", "helloworld_ar.png", DrawStringFlags.RunBidi | DrawStringFlags.ArabicShaping | DrawStringFlags.RemoveArabicTashkeel)]
+        public void DrawText(string text, string referenceImage, DrawStringFlags flags)
         {
             using (var image = new Image(400, 400))
             {
-                var red = new Color(0xff, 0, 0);
-                
+                var white = new Color(0xff, 0xff, 0xff);
+                var black = new Color(0, 0, 0);
+                image.DrawFilledRectangle(new Rectangle(0, 0, image.Width - 1, image.Height - 1), white);
+                image.DrawString(text, new Point(40, 40), "DejaVuSans", 12, 0, black, flags);
 
-                image.DrawString("Hello world!", new Point(40, 40), "Arial", 12, 0, red);
+                var png = new PngImageFormatter();
                 
-                      
+                using (var reference = png.ReadImageFromFile(referenceImage))
+                {
+                    var result = image.CompareTo(reference);
+                    Assert.Equal(ImageCompareResult.Similar, result);
+                }
             }
         }
 
         [Fact]
-        public void DrawArabicText()
+        public void DrawTextInvalidFont()
         {
-            using (var image = new Image(400, 400))
+            Assert.Throws<FileNotFoundException>(() =>
             {
-                var red = new Color(0xff, 0, 0);
+                using (var image = new Image(400, 400))
+                {
+                    var white = new Color(0xff, 0xff, 0xff);
+                    var black = new Color(0, 0, 0);
+                    image.DrawFilledRectangle(new Rectangle(0, 0, image.Width - 1, image.Height - 1), white);
+                    var f = Guid.NewGuid().ToString("n");
 
-
-                image.DrawString("مرحبا بالعالم!"
-                        +Environment.NewLine
-                        +"مرحبا بالعالم!"
-                    , new Point(40, 40), "Arial", 12, 0, red);
-
-                var png = new PngImageFormatter();
-                png.WriteImageToFile(image, "fi.png");
-            }
+                    image.DrawString(f, new Point(40, 40), f,  12, 0, black);
+                }
+            });
         }
     }
 }

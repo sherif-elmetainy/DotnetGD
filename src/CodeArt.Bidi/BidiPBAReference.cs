@@ -16,7 +16,7 @@
 
 using System;
 using System.Collections.Generic;
-using static CodeArt.Bidi.BidiCategory;
+using static CodeArt.Bidi.BidiDirection;
 
 namespace CodeArt.Bidi
 {
@@ -142,7 +142,7 @@ namespace CodeArt.Bidi
          * Bidi_Paired_Bracket_Type property value is Close.
          */
 
-        private BidiCategory _sos; // direction corresponding to start of sequence
+        private BidiDirection _sos; // direction corresponding to start of sequence
 
         // Holds a pair of index values for opening and closing bracket location of
         // a bracket pair
@@ -243,7 +243,7 @@ namespace CodeArt.Bidi
         }
 
 
-        public BidiCategory[] CodesIsolatedRun; // directional bidi codes for an isolated run
+        public BidiDirection[] CodesIsolatedRun; // directional bidi codes for an isolated run
         private int[] _indexes; // array of index values into the original string
 
         /**
@@ -410,7 +410,7 @@ namespace CodeArt.Bidi
          *            - index into array of directional codes
          * @return R or L for strong directional codes, ON for anything else
          */
-        private BidiCategory GetStrongTypeN0(int ich)
+        private BidiDirection GetStrongTypeN0(int ich)
         {
 
             switch (CodesIsolatedRun[ich])
@@ -439,7 +439,7 @@ namespace CodeArt.Bidi
          *         direction, unless the only strong type found is opposite the
          *         embedding direction, in which case that is returned
          */
-        BidiCategory ClassifyPairContent(BracketPair pairedLocation, BidiCategory dirEmbed)
+        BidiDirection ClassifyPairContent(BracketPair pairedLocation, BidiDirection dirEmbed)
         {
             var dirOpposite = ON;
             for (var ich = pairedLocation.GetOpener() + 1; ich < pairedLocation
@@ -463,7 +463,7 @@ namespace CodeArt.Bidi
          *            - a bracket pair
          * @return R or L if strong type found, otherwise ON
          */
-        BidiCategory ClassBeforePair(BracketPair pairedLocation)
+        BidiDirection ClassBeforePair(BracketPair pairedLocation)
         {
             for (var ich = pairedLocation.GetOpener() - 1; ich >= 0; --ich)
             {
@@ -483,7 +483,7 @@ namespace CodeArt.Bidi
          * @param dirEmbed
          *            - the embedding direction
          */
-        void AssignBracketType(BracketPair pairedLocation, BidiCategory dirEmbed)
+        void AssignBracketType(BracketPair pairedLocation, BidiDirection dirEmbed)
         {
             // rule "N0, a", inspect contents of pair
             var dirPair = ClassifyPairContent(pairedLocation, dirEmbed);
@@ -513,14 +513,14 @@ namespace CodeArt.Bidi
             SetBracketsToType(pairedLocation, dirPair);
         }
 
-        private void SetBracketsToType(BracketPair pairedLocation, BidiCategory dirPair)
+        private void SetBracketsToType(BracketPair pairedLocation, BidiDirection dirPair)
         {
             CodesIsolatedRun[pairedLocation.GetOpener()] = dirPair;
             CodesIsolatedRun[pairedLocation.GetCloser()] = dirPair;
         }
 
         // this implements rule N0 for a list of pairs
-        public void ResolveBrackets(BidiCategory dirEmbed)
+        public void ResolveBrackets(BidiDirection dirEmbed)
         {
             foreach (var pair in _pairPositions)
             {
@@ -556,8 +556,8 @@ namespace CodeArt.Bidi
          * @param level
          *            - the embedding level
          */
-        public void ResolvePairedBrackets(int[] indexes, BidiCategory[] codes, BracketType[] pairTypes,
-                int[] pairValues, BidiCategory sos, sbyte level)
+        public void ResolvePairedBrackets(int[] indexes, BidiDirection[] codes, BracketType[] pairTypes,
+                int[] pairValues, BidiDirection sos, sbyte level)
         {
             var dirEmbed = 1 == (level & 1) ? R
                     : L;
@@ -584,8 +584,8 @@ namespace CodeArt.Bidi
          * @param level
          *            - the embedding level
          */
-        public void RunAlgorithm(BidiCategory[] codes, BracketType[] pairTypes,
-                int[] pairValues, BidiCategory sos, sbyte level)
+        public void RunAlgorithm(BidiDirection[] codes, BracketType[] pairTypes,
+                int[] pairValues, BidiDirection sos, sbyte level)
         {
 
             // dummy up an indexes array that represents an identity mapping

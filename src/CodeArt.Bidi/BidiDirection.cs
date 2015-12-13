@@ -1,6 +1,9 @@
 ﻿namespace CodeArt.Bidi
 {
-    public enum BidiCategory
+    /// <summary>
+    /// Bidi direction
+    /// </summary>
+    public enum BidiDirection
     {
         /** Left-to-right */
         L = 0,

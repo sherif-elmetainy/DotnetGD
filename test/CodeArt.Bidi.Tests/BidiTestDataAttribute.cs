@@ -33,11 +33,11 @@ namespace CodeArt.Bidi.Tests
 
         private static object[] ParseLine(string line, int n)
         {
-            var split1 = line.Split(';');
-            var str = new string(split1[0].Split(' ').Select(s => (char)int.Parse(s, NumberStyles.HexNumber)).ToArray());
-            var res = new string(split1[4].Split(' ').Select(int.Parse).Select(i => str[i]).ToArray());
-            var dir = sbyte.Parse(split1[1]);
-            return new object[] { str, res, dir, line, n };
+            //var split1 = line.Split(';');
+            //var str = new string(split1[0].Split(' ').Select(s => (char)int.Parse(s, NumberStyles.HexNumber)).ToArray());
+            //var res = new string(split1[4].Split(' ').Select(int.Parse).Select(i => str[i]).ToArray());
+            //var dir = sbyte.Parse(split1[1]);
+            return new object[] { line, n };
         }
     }
 }

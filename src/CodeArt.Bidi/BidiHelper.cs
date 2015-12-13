@@ -1,51 +1,68 @@
-﻿using System.Globalization;
-using System.Linq;
-using System.Security;
+﻿using System.Linq;
 using System.Text;
 
 namespace CodeArt.Bidi
 {
+    /// <summary>
+    ///     Bidi helper class
+    /// </summary>
     public class BidiHelper
     {
-        public static string FormatString(string str, sbyte dir)
+        internal static bool IsBidiControlChar(int c)
         {
-            var info = new BidiStringInfo(str);
-            var bidi = new BidiReference(info.Types, info.BracketTypes, info.BracketValues, dir);
-            var reordering = bidi.GetReordering(info.LineBreaks);
-            //var levels = bidi.GetLevels(info.LineBreaks);
-            //var resultTypes = bidi.GetResultTypes();
-            var sb = new StringBuilder(str.Length);
+            /* check for range 0x200c to 0x200f (ZWNJ, ZWJ, LRM, RLM) or
+                               0x202a to 0x202e (LRE, RLE, PDF, LRO, RLO) */
+            return (((c & 0xfffffffc) == 0x200c) || ((c >= 0x202a) && (c <= 0x202e))
+                                                 || ((c >= 0x2066) && (c <= 0x2069)));
+        }
 
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var i = 0; i < reordering.Length; i++)
+        private static readonly char[] LineBreakChars = new[] {'\r', '\n'};
+        public static string FormatString(string str, ParagraphDirection dir)
+        {
+            var sb = new StringBuilder(str.Length);
+            var index = 0;
+            while (index < str.Length)
             {
-                var index = reordering[i];
-                var code = info.Codes[index];
-                //var type = resultTypes[index];
-                //if (type == BidiCategory.LRE
-                //    || type == BidiCategory.LRO
-                //    || type == BidiCategory.RLE
-                //    || type == BidiCategory.RLO
-                //    || type == BidiCategory.PDF
-                //    || type == BidiCategory.PDI
-                //    || type == BidiCategory.LRI
-                //    || type == BidiCategory.RLI
-                //    || type == BidiCategory.FSI
-                //    || type == BidiCategory.B
-                //    || type == BidiCategory.S
-                //    || type == BidiCategory.BN
-                //    )
-                //    continue;
-                if (code > UnicodeData.TwoWordCodepointStart)
+                if (LineBreakChars.Contains(str[index]))
                 {
-                    UnicodeData.WriteCodepoint(sb, code);
+                    sb.Append(str[index]);
+                    index++;
+                    continue;
                 }
+                var len = str.IndexOfAny(LineBreakChars, index);
+                if (len == -1)
+                    len = str.Length - index;
                 else
+                    len = len - index;
+                var substr = str;
+                if (index != 0 || len != str.Length)
+                    substr = str.Substring(index, len);
+                index += len;
+                var info = new BidiStringInfo(substr);
+                var bidi = new BidiReference(info.Types, info.BracketTypes, info.BracketValues, dir);
+                var reordering = bidi.GetReordering(info.LineBreaks);
+
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var i = 0; i < reordering.Length; i++)
                 {
-                    var cat = CharUnicodeInfo.GetUnicodeCategory((char)code);
-                    if (cat == UnicodeCategory.Format)
-                        continue;
-                    sb.Append((char) code);
+                    var orderIndex = reordering[i];
+                    var code = info.Codes[orderIndex];
+
+                    if (code > UnicodeData.TwoWordCodepointStart)
+                    {
+                        UnicodeData.WriteCodepoint(sb, code);
+                    }
+                    else
+                    {
+                        if (IsBidiControlChar(code))
+                        {
+                            continue;
+                        }
+                        //var cat = CharUnicodeInfo.GetUnicodeCategory((char) code);
+                        //if (cat == UnicodeCategory.Format)
+                        //    continue;
+                        sb.Append((char) code);
+                    }
                 }
             }
             return sb.ToString();

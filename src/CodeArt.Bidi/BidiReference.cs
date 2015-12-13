@@ -35,7 +35,7 @@
   */
 using System;
 using System.Linq;
-using static CodeArt.Bidi.BidiCategory;
+using static CodeArt.Bidi.BidiDirection;
 
 namespace CodeArt.Bidi
 {
@@ -95,15 +95,14 @@ namespace CodeArt.Bidi
 
     public class BidiReference
     {
-        private readonly BidiCategory[] _initialTypes;
-        private static readonly sbyte ImplicitEmbeddingLevel = 2; // level will be determined implicitly
-        private sbyte _paragraphEmbeddingLevel = ImplicitEmbeddingLevel;
+        private readonly BidiDirection[] _initialTypes;
+        private ParagraphDirection _paragraphEmbeddingLevel = ParagraphDirection.Default;
 
         private int _textLength; // for convenience
-        private BidiCategory[] _resultTypes; // for paragraph, not lines
+        private BidiDirection[] _resultTypes; // for paragraph, not lines
         private sbyte[] _resultLevels; // for paragraph, not lines
 
-        public BidiCategory[] GetResultTypes() => _resultTypes.ToArray(); // for display in test mode
+        public BidiDirection[] GetResultTypes() => _resultTypes.ToArray(); // for display in test mode
 
         /*
          * Index of matching PDI for isolate initiator characters. For other
@@ -146,7 +145,7 @@ namespace CodeArt.Bidi
          * 			  bracket get the same value if they are part of the same canonical "set"
          * 			  or pair)
          */
-        public BidiReference(BidiCategory[] types, BracketType[] pairTypes, int[] pairValues)
+        public BidiReference(BidiDirection[] types, BracketType[] pairTypes, int[] pairValues)
         {
             ValidateTypes(types);
             ValidatePbTypes(pairTypes);
@@ -175,7 +174,7 @@ namespace CodeArt.Bidi
          * @param _paragraphEmbeddingLevel
          *            the externally supplied paragraph embedding level.
          */
-        public BidiReference(BidiCategory[] types, BracketType[] pairTypes, int[] pairValues, sbyte paragraphEmbeddingLevel)
+        public BidiReference(BidiDirection[] types, BracketType[] pairTypes, int[] pairValues, ParagraphDirection paragraphEmbeddingLevel)
         {
             ValidateTypes(types);
             ValidatePbTypes(pairTypes);
@@ -211,14 +210,14 @@ namespace CodeArt.Bidi
             // Rule P1 is the requirement for entering this algorithm.
             // Rules P2, P3.
             // If no externally supplied paragraph embedding level, use default.
-            if (_paragraphEmbeddingLevel == ImplicitEmbeddingLevel)
+            if (_paragraphEmbeddingLevel == ParagraphDirection.Default)
             {
                 _paragraphEmbeddingLevel = DetermineParagraphEmbeddingLevel(0, _textLength);
             }
 
             // Initialize result levels to paragraph embedding level.
             _resultLevels = new sbyte[_textLength];
-            SetLevels(_resultLevels, 0, _textLength, _paragraphEmbeddingLevel);
+            SetLevels(_resultLevels, 0, _textLength, (sbyte)_paragraphEmbeddingLevel);
 
             // 2) Explicit levels and directions
             // Rules X1-X8.
@@ -337,7 +336,7 @@ namespace CodeArt.Bidi
          * @return the resolved paragraph direction of the substring limited by
          *         startIndex and endIndex
          */
-        private sbyte DetermineParagraphEmbeddingLevel(int startIndex, int endIndex)
+        private ParagraphDirection DetermineParagraphEmbeddingLevel(int startIndex, int endIndex)
         {
             var strongType = Unknown; // unknown
 
@@ -361,14 +360,14 @@ namespace CodeArt.Bidi
             if (strongType == Unknown)
             { // none found
               // default embedding level when no strong types found is 0.
-                return 0;
+                return ParagraphDirection.Left;
             }
             if (strongType == L)
             {
-                return 0;
+                return ParagraphDirection.Left;
             }
             // AL, R
-            return 1;
+            return ParagraphDirection.Right;
         }
 
         public const int MaxDepth = 125;
@@ -379,7 +378,7 @@ namespace CodeArt.Bidi
         {
             private int _stackCounter;
             private readonly sbyte[] _embeddingLevelStack = new sbyte[MaxDepth + 1];
-            private readonly BidiCategory[] _overrideStatusStack = new BidiCategory[MaxDepth + 1];
+            private readonly BidiDirection[] _overrideStatusStack = new BidiDirection[MaxDepth + 1];
             private readonly bool[] _isolateStatusStack = new bool[MaxDepth + 1];
 
             public void Empty()
@@ -387,7 +386,7 @@ namespace CodeArt.Bidi
                 _stackCounter = 0;
             }
 
-            public void Push(sbyte level, BidiCategory overrideStatus, bool isolateStatus)
+            public void Push(sbyte level, BidiDirection overrideStatus, bool isolateStatus)
             {
                 _embeddingLevelStack[_stackCounter] = level;
                 _overrideStatusStack[_stackCounter] = overrideStatus;
@@ -410,7 +409,7 @@ namespace CodeArt.Bidi
                 return _embeddingLevelStack[_stackCounter - 1];
             }
 
-            public BidiCategory LastDirectionalOverrideStatus()
+            public BidiDirection LastDirectionalOverrideStatus()
             {
                 return _overrideStatusStack[_stackCounter - 1];
             }
@@ -430,7 +429,7 @@ namespace CodeArt.Bidi
 
             // Rule X1.
             stack.Empty();
-            stack.Push(_paragraphEmbeddingLevel, ON, false);
+            stack.Push((sbyte)_paragraphEmbeddingLevel, ON, false);
             var overflowIsolateCount = 0;
             var overflowEmbeddingCount = 0;
             var validIsolateCount = 0;
@@ -453,7 +452,7 @@ namespace CodeArt.Bidi
                         // override if this is an FSI that resolves to RLI
                         if (t == FSI)
                         {
-                            isRtl = DetermineParagraphEmbeddingLevel(i + 1, _matchingPDI[i]) == 1;
+                            isRtl = DetermineParagraphEmbeddingLevel(i + 1, _matchingPDI[i]) == ParagraphDirection.Right;
                         }
 
                         if (isIsolate)
@@ -563,7 +562,7 @@ namespace CodeArt.Bidi
                         overflowIsolateCount = 0;
                         overflowEmbeddingCount = 0;
                         validIsolateCount = 0;
-                        _resultLevels[i] = _paragraphEmbeddingLevel;
+                        _resultLevels[i] = (sbyte)_paragraphEmbeddingLevel;
                         break;
 
                     default:
@@ -581,13 +580,13 @@ namespace CodeArt.Bidi
         {
             private readonly int[] _indexes; // indexes to the original string
             private readonly BidiReference _bidiReference;
-            private readonly BidiCategory[] _types; // type of each character using the index
+            private readonly BidiDirection[] _types; // type of each character using the index
             private sbyte[] _resolvedLevels; // resolved levels after application of
                                             // rules
             private readonly int _length; // length of isolating run sequence in
                                          // characters
             private readonly sbyte _level;
-            private readonly BidiCategory _sos, _eos;
+            private readonly BidiDirection _sos, _eos;
 
             /**
              * Rule X10, second bullet: Determine the start-of-sequence (sos) and end-of-sequence (eos) types,
@@ -600,7 +599,7 @@ namespace CodeArt.Bidi
                 _bidiReference = bidiReference;
                 _length = _indexes.Length;
 
-                _types = new BidiCategory[_length];
+                _types = new BidiDirection[_length];
                 for (var i = 0; i < _length; ++i)
                 {
                     _types[i] = _bidiReference._resultTypes[_indexes[i]];
@@ -614,14 +613,14 @@ namespace CodeArt.Bidi
                 {
                     --prevChar;
                 }
-                var prevLevel = prevChar >= 0 ? _bidiReference._resultLevels[prevChar] : _bidiReference._paragraphEmbeddingLevel;
+                var prevLevel = prevChar >= 0 ? _bidiReference._resultLevels[prevChar] : (sbyte)_bidiReference._paragraphEmbeddingLevel;
                 _sos = TypeForLevel(Math.Max(prevLevel, _level));
 
                 var lastType = _types[_length - 1];
                 sbyte succLevel;
                 if (lastType == LRI || lastType == RLI || lastType == FSI)
                 {
-                    succLevel = _bidiReference._paragraphEmbeddingLevel;
+                    succLevel = (sbyte)_bidiReference._paragraphEmbeddingLevel;
                 }
                 else
                 {
@@ -632,7 +631,7 @@ namespace CodeArt.Bidi
                     {
                         ++limit;
                     }
-                    succLevel = limit < _bidiReference._textLength ? _bidiReference._resultLevels[limit] : _bidiReference._paragraphEmbeddingLevel;
+                    succLevel = limit < _bidiReference._textLength ? _bidiReference._resultLevels[limit] : (sbyte)_bidiReference._paragraphEmbeddingLevel;
                 }
                 _eos = TypeForLevel(Math.Max(succLevel, _level));
             }
@@ -816,8 +815,8 @@ namespace CodeArt.Bidi
                         var runlimit = FindRunLimit(runstart, _length, new[] { B, S, WS, ON, RLI, LRI, FSI, PDI });
 
                         // determine effective types at ends of run
-                        BidiCategory leadingType;
-                        BidiCategory trailingType;
+                        BidiDirection leadingType;
+                        BidiDirection trailingType;
 
                         // Note that the character found can only be L, R, AN, or
                         // EN.
@@ -847,7 +846,7 @@ namespace CodeArt.Bidi
                             }
                         }
 
-                        BidiCategory resolvedType;
+                        BidiDirection resolvedType;
                         // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
                         if (leadingType == trailingType)
                         {
@@ -940,7 +939,7 @@ namespace CodeArt.Bidi
              * index if that value is not in validSet.
              */
             // ReSharper disable once SuggestBaseTypeForParameter
-            private int FindRunLimit(int index, int limit, BidiCategory[] validSet)
+            private int FindRunLimit(int index, int limit, BidiDirection[] validSet)
             {
                 while (index < limit)
                 {
@@ -969,7 +968,7 @@ namespace CodeArt.Bidi
             /**
              * Set types from start up to (but not including) limit to newType.
              */
-            private void SetTypes(int start, int limit, BidiCategory newType)
+            private void SetTypes(int start, int limit, BidiDirection newType)
             {
                 for (var i = start; i < limit; ++i)
                 {
@@ -981,7 +980,7 @@ namespace CodeArt.Bidi
              * Algorithm validation. Assert that all values in types are in the
              * provided set.
              */
-            private void AssertOnly(BidiCategory[] codes)
+            private void AssertOnly(BidiDirection[] codes)
             {
                 for (var i = 0; i < _length; ++i)
                 {
@@ -1144,7 +1143,7 @@ namespace CodeArt.Bidi
 
             if (_resultLevels[0] == -1)
             {
-                _resultLevels[0] = _paragraphEmbeddingLevel;
+                _resultLevels[0] = (sbyte)_paragraphEmbeddingLevel;
             }
             for (var i = 1; i < _initialTypes.Length; ++i)
             {
@@ -1205,7 +1204,7 @@ namespace CodeArt.Bidi
                 if (t == B || t == S)
                 {
                     // Rule L1, clauses one and two.
-                    result[i] = _paragraphEmbeddingLevel;
+                    result[i] = (sbyte)_paragraphEmbeddingLevel;
 
                     // Rule L1, clause three.
                     for (var j = i - 1; j >= 0; --j)
@@ -1213,7 +1212,7 @@ namespace CodeArt.Bidi
                         if (IsWhitespace(_initialTypes[j]))
                         { // including format
                           // codes
-                            result[j] = _paragraphEmbeddingLevel;
+                            result[j] = (sbyte)_paragraphEmbeddingLevel;
                         }
                         else
                         {
@@ -1233,7 +1232,7 @@ namespace CodeArt.Bidi
                 {
                     if (IsWhitespace(_initialTypes[j]))
                     { // including format codes
-                        result[j] = _paragraphEmbeddingLevel;
+                        result[j] = (sbyte)_paragraphEmbeddingLevel;
                     }
                     else
                     {
@@ -1379,7 +1378,7 @@ namespace CodeArt.Bidi
          */
         public sbyte GetBaseLevel()
         {
-            return _paragraphEmbeddingLevel;
+            return (sbyte)_paragraphEmbeddingLevel;
         }
 
         // --- internal utilities -------------------------------------------------
@@ -1388,7 +1387,7 @@ namespace CodeArt.Bidi
          * Return true if the type is considered a whitespace type for the line
          * break rules.
          */
-        private static bool IsWhitespace(BidiCategory biditype)
+        private static bool IsWhitespace(BidiDirection biditype)
         {
             // ReSharper disable once SwitchStatementMissingSomeCases
             switch (biditype)
@@ -1414,7 +1413,7 @@ namespace CodeArt.Bidi
          * Return true if the type is one of the types removed in X9.
          * Made public so callers can duplicate the effect.
          */
-        public static bool IsRemovedByX9(BidiCategory biditype)
+        public static bool IsRemovedByX9(BidiDirection biditype)
         {
             // ReSharper disable once SwitchStatementMissingSomeCases
             switch (biditype)
@@ -1434,7 +1433,7 @@ namespace CodeArt.Bidi
         /**
          * Return the strong type (L or R) corresponding to the level.
          */
-        private static BidiCategory TypeForLevel(int level)
+        private static BidiDirection TypeForLevel(int level)
         {
             return (level & 0x1) == 0 ? L : R;
         }
@@ -1455,7 +1454,7 @@ namespace CodeArt.Bidi
         /**
          * Throw exception if type array is invalid.
          */
-        private static void ValidateTypes(BidiCategory[] types)
+        private static void ValidateTypes(BidiDirection[] types)
         {
             if (types == null)
             {
@@ -1483,11 +1482,11 @@ namespace CodeArt.Bidi
          * paragraph embedding level as implicit can still be performed when
          * using this API.
          */
-        private static void ValidateParagraphEmbeddingLevel(sbyte paragraphEmbeddingLevel)
+        private static void ValidateParagraphEmbeddingLevel(ParagraphDirection paragraphEmbeddingLevel)
         {
-            if (paragraphEmbeddingLevel != ImplicitEmbeddingLevel &&
-                    paragraphEmbeddingLevel != 0 &&
-                    paragraphEmbeddingLevel != 1)
+            if (paragraphEmbeddingLevel != ParagraphDirection.Default &&
+                    paragraphEmbeddingLevel != ParagraphDirection.Left &&
+                    paragraphEmbeddingLevel != ParagraphDirection.Right)
             {
                 throw new ArgumentException("illegal paragraph embedding level: " + paragraphEmbeddingLevel, nameof(paragraphEmbeddingLevel));
             }
@@ -1557,7 +1556,7 @@ namespace CodeArt.Bidi
          * @param _paragraphEmbeddingLevel
          *            the externally supplied paragraph embedding level.
          */
-        public static BidiReference AnalyzeInput(BidiCategory[] types, BracketType[] pairTypes, int[] pairValues, sbyte paragraphEmbeddingLevel)
+        public static BidiReference AnalyzeInput(BidiDirection[] types, BracketType[] pairTypes, int[] pairValues, ParagraphDirection paragraphEmbeddingLevel)
         {
             var bidi = new BidiReference(types, pairTypes, pairValues, paragraphEmbeddingLevel);
             return bidi;

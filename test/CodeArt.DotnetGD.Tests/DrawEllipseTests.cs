@@ -1,5 +1,4 @@
-﻿using CodeArt.DotnetGD;
-using Xunit;
+﻿using Xunit;
 
 namespace CodeArt.DotnetGD.Tests
 {

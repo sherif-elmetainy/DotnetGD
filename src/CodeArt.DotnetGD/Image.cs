@@ -4,6 +4,21 @@ using CodeArt.DotnetGD.Libgd;
 
 namespace CodeArt.DotnetGD
 {
+    /// <summary>
+    /// Image class (a managed wrapper around libgd Image).
+    /// WARNING: This class is NOT Thread safe and as an unsafe wrapper that used unamanged pointers, 
+    /// Unexpected results (including host process crashing) can occur if race conditions occur.
+    /// I have considered using locks every where the image pointer is access, 
+    /// however the most typical use would not have the Image used in multiple threads. 
+    /// So I would rather have this warning here and leave it up to the consumer to use locks if needed.
+    /// 
+    /// It is theoritically safe to  have multiple threads read the Image instance 
+    /// (For example having the image in a static field and using it as a brush or a tile for other images).
+    /// 
+    /// So if you are going to use multiple threads to write to the image (very uncommon scenario), then locks must be used.
+    /// A race condition can also occur when Disposing the Image in one thread and trying to read it in another thread.
+    /// 
+    /// </summary>
     public sealed unsafe partial class Image : IDisposable
     {
         static Image()
@@ -12,6 +27,8 @@ namespace CodeArt.DotnetGD
         }
 
         internal GdImage* ImagePtr;
+        // when an image is referenced as a brush or a tile for another image  
+        // a reference is incremented to prevent the image from being disposed
         private int _references = 1;
 
         public const int PaletteQuantizationSpeedBestQuality = 1;

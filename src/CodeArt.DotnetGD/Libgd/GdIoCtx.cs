@@ -6,10 +6,14 @@ using System.Threading;
 
 namespace CodeArt.DotnetGD.Libgd
 {
+    /// <summary>
+    ///     A GdIoCtx structure to support passing streams to LibGD
+    /// </summary>
     internal unsafe struct GdIoCtx : IDisposable
     {
         private const CallingConvention CallbackConvention = CallingConvention.Cdecl;
 
+        // Delegate types used by call backs
         [UnmanagedFunctionPointer(CallbackConvention)]
         private delegate int GetCDelelegate(GdIoCtx* ioCtx);
         [UnmanagedFunctionPointer(CallbackConvention)]
@@ -27,6 +31,7 @@ namespace CodeArt.DotnetGD.Libgd
 
         public GdIoCtx(Stream stream)
         {
+            // Setup callbacks called by libgd to read from or write to the stream
             _getC = Marshal.GetFunctionPointerForDelegate<GetCDelelegate>(GetC);
             _getBuff = Marshal.GetFunctionPointerForDelegate<GetBufDelegate>(GetBuf);
             _putC = Marshal.GetFunctionPointerForDelegate<PutCDelegate>(PutC);
@@ -34,6 +39,8 @@ namespace CodeArt.DotnetGD.Libgd
             _seek = Marshal.GetFunctionPointerForDelegate<SeekDelegate>(Seek);
             _tell = Marshal.GetFunctionPointerForDelegate<TellDelegate>(Tell);
             _gdFree = Marshal.GetFunctionPointerForDelegate<GdFreeDelegate>(GdFree);
+
+
             _data = IntPtr.Zero;
             _key = Interlocked.Increment(ref _currentKey);
             lock (Streams)
@@ -51,9 +58,10 @@ namespace CodeArt.DotnetGD.Libgd
         private readonly IntPtr _tell;
         private readonly IntPtr _gdFree;
         private readonly IntPtr _data;
-        //private Stream _data;
         // ReSharper restore NotAccessedField.Local
 
+        // Since it's not possible to have an instance member managed reference and obtain a pointer to the GdIoCtx
+        // We store the stream object in a static dictionary and have the key as an instance member
         private readonly long _key;
         private static long _currentKey;
         private static readonly Dictionary<long, Stream> Streams = new Dictionary<long, Stream>();

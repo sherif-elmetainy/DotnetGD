@@ -2,8 +2,17 @@
 
 namespace CodeArt.DotnetGD.Libgd
 {
+    /// <summary>
+    /// libgd image structure
+    /// </summary>
     public unsafe struct GdImage
     {
+        /// <summary>
+        /// repersents 4 integers.
+        /// LibGD Image structure contains int XXXX[256] members
+        /// Using int[] and marshal as size const in .NET will make it impossible to obtain a pointer to GdImage,
+        /// So this hack is implemented
+        /// </summary>
         private struct Colors4
         {
             private int _a1;
@@ -52,6 +61,12 @@ namespace CodeArt.DotnetGD.Libgd
             }
         }
 
+        /// <summary>
+        /// repersents 16 integers.
+        /// LibGD Image structure contains int XXXX[256] members
+        /// Using int[] and marshal as size const in .NET will make it impossible to obtain a pointer to GdImage,
+        /// So this hack is implemented
+        /// </summary>
         private struct Colors16
         {
             private Colors4 _a1;
@@ -106,6 +121,12 @@ namespace CodeArt.DotnetGD.Libgd
             }
         }
 
+        /// <summary>
+        /// repersents 64 integers.
+        /// LibGD Image structure contains int XXXX[256] members
+        /// Using int[] and marshal as size const in .NET will make it impossible to obtain a pointer to GdImage,
+        /// So this hack is implemented
+        /// </summary>
         private struct Colors64
         {
             private Colors16 _a1;
@@ -160,6 +181,12 @@ namespace CodeArt.DotnetGD.Libgd
             }
         }
 
+        /// <summary>
+        /// repersents 256 integers.
+        /// LibGD Image structure contains int XXXX[256] members
+        /// Using int[] and marshal as size const in .NET will make it impossible to obtain a pointer to GdImage,
+        /// So this hack is implemented
+        /// </summary>
         public struct Colors256
         {
             private Colors64 _a1;

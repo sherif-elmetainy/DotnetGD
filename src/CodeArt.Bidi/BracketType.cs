@@ -2,8 +2,8 @@
 {
     public enum BracketType
     {
-        Opening,
-        Closing,
-        None
+        None = 0,
+        Opening = 1,
+        Closing = 2,
     }
 }

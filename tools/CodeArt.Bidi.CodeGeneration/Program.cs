@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -8,19 +7,38 @@ using Microsoft.Extensions.PlatformAbstractions;
 
 namespace CodeArt.Bidi.CodeGeneration
 {
-    public static class Program
+    public class Program
     {
         // ReSharper disable PossibleNullReferenceException
         private static readonly string Namespace =
-            typeof (Program).Namespace.Substring(0, typeof (Program).Namespace.LastIndexOf('.'));
+            typeof(Program).Namespace.Substring(0, typeof(Program).Namespace.LastIndexOf('.'));
         // ReSharper restore PossibleNullReferenceException
         private static readonly Regex BidiBracketsRegex = new Regex(@"^(?<k>[a-fA-F0-9]{4});\s+(?<v>[a-fA-F0-9]{4});\s+(?<t>o|c)");
-        private static readonly Regex BidiCategoryRegex = new Regex(@"^(?<f>[a-fA-F0-9]{4,})(?:\.\.(?<t>[a-fA-F0-9]{4,}))\s+;\s+(?<c>[A-Z]{1,3})");
-
+        private static readonly Regex MirrorRegex = new Regex(@"^(?<k>[a-fA-F0-9]{4});\s+(?<v>[a-fA-F0-9]{4})");
+        private static readonly Regex UnicodeDataRegex = new Regex(@"^(?<cp>[a-fA-F0-9]{4,6});(?<n>[^;]*);[^;]*;[^;]*;(?<bd>[^;]*);");
         public static void Main(string[] args)
         {
-            GenerateFile("BidiBrackets.txt", "UnicodeData.Brackets.cs", WriteBracketsCode);
-            GenerateFile("DerivedBidiClass.txt", "UnicodeData.BidiCategories.cs", WriteBidiClassCode);
+            var data = new long[UnicodeDataHelper.MaximumUnicodeCodePoint];
+            ReadUnicodeData(data);
+            ReadBracketData(data);
+            ReadMirrorData(data);
+            WriteDataFile(data);
+        }
+
+        // ReSharper disable once ParameterTypeCanBeEnumerable.Local
+        private static void WriteDataFile(long[] data)
+        {
+            using (var fs = File.Create(Path.Combine(GetCodeGenerationDirectory(), "Unicode.dat")))
+            {
+                var binaryWriter = new BinaryWriter(fs);
+                for (var index = 0; index < data.Length; index++)
+                {
+                    var item = data[index];
+                    if (item == 0) continue;
+                    binaryWriter.Write(index);
+                    binaryWriter.Write(item);
+                }
+            }
         }
 
         private static string GetCodeGenerationDirectory()
@@ -29,103 +47,95 @@ namespace CodeArt.Bidi.CodeGeneration
             var currentDir = new DirectoryInfo(appPath);
             Debug.Assert(currentDir.Parent != null, "currentDir.Parent != null");
             Debug.Assert(currentDir.Parent.Parent != null, "currentDir.Parent.Parent != null");
-            return Path.Combine(currentDir.Parent.Parent.FullName, "src", Namespace);
+            return Path.Combine(currentDir.Parent.Parent.FullName, "src", Namespace, "Data");
         }
 
-        private static void GenerateFile(string source, string destination,
-            Action<TextWriter, TextReader> generateCodeAction)
+        private static StreamReader OpenDataFile(string name)
         {
-            using (var sourceStream = File.OpenRead(source))
+            var appPath = PlatformServices.Default.Application.ApplicationBasePath;
+            return File.OpenText(Path.Combine(appPath, name));
+        }
+
+        // ReSharper disable once SuggestBaseTypeForParameter
+        private static void ReadMirrorData(long[] data)
+        {
+            using (var reader = OpenDataFile("BidiMirroring.txt"))
             {
-                using (var streamReader = new StreamReader(sourceStream))
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
-                    var path = Path.Combine(GetCodeGenerationDirectory(), destination);
-                    using (var targetStream = File.Create(path))
+                    var m = MirrorRegex.Match(line);
+                    if (!m.Success) continue;
+                    var key = int.Parse(m.Groups["k"].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                    var val = int.Parse(m.Groups["v"].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                    data[key] = UnicodeDataHelper.SetMirror(data[key], val);
+                }
+            }
+        }
+
+        // ReSharper disable once SuggestBaseTypeForParameter
+        private static void ReadBracketData(long[] data)
+        {
+            using (var reader = OpenDataFile("BidiBrackets.txt"))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    var m = BidiBracketsRegex.Match(line);
+                    if (!m.Success) continue;
+                    var key = int.Parse(m.Groups["k"].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                    var val = int.Parse(m.Groups["v"].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                    var type = m.Groups["t"].Value == "o" ? BracketType.Opening : BracketType.Closing;
+                    data[key] = UnicodeDataHelper.SetMatchingBracket(data[key], val);
+                    data[key] = UnicodeDataHelper.SetBracketType(data[key], (int)type);
+                }
+            }
+        }
+
+
+        // ReSharper disable once SuggestBaseTypeForParameter
+        private static void ReadUnicodeData(long[] data)
+        {
+            using (var reader = OpenDataFile("UnicodeData.txt"))
+            {
+                var i = 0;
+                var wasStart = false;
+                string line;
+                var lastDirection = 0;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    var m = UnicodeDataRegex.Match(line);
+                    if (!m.Success)
+                        throw new InvalidOperationException($"Line: {line} does not match.");
+                    var cp = int.Parse(m.Groups["cp"].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                    var dir = (int)(BidiDirection)Enum.Parse(typeof(BidiDirection), m.Groups["bd"].Value, true);
+                    var name = m.Groups["n"].Value;
+                    var isStart = name.EndsWith("First>", StringComparison.OrdinalIgnoreCase);
+                    var isEnd = name.EndsWith("Last>", StringComparison.OrdinalIgnoreCase);
+
+                    if (isEnd)
                     {
-                        using (var streamWriter = new StreamWriter(targetStream))
+                        if (!wasStart)
+                            throw new InvalidOperationException($"Line: {line} is end without matching start.");
+
+                        while (i < cp)
                         {
-                            generateCodeAction(streamWriter, streamReader);
+                            data[i] = UnicodeDataHelper.SetDirection(data[i], lastDirection);
+                            i++;
                         }
                     }
+                    else if (wasStart)
+                    {
+                        throw new InvalidOperationException($"Line: {line} previous line was start without matching end.");
+                    }
+                    i = cp;
+                    data[i] = UnicodeDataHelper.SetDirection(data[i], dir);
+                    lastDirection = dir;
+                    wasStart = isStart;
                 }
+                if (wasStart)
+                    throw new InvalidOperationException("Line: Last line was without matching end.");
             }
-        }
-
-        private static void WriteBidiClassCode(TextWriter textWriter, TextReader textReader)
-        {
-            var data = new List<Tuple<int, int, string>>();
-            string line;
-            while ((line = textReader.ReadLine()) != null)
-            {
-                var m = BidiCategoryRegex.Match(line);
-                if (!m.Success) continue;
-                var from = int.Parse(m.Groups["f"].Value, NumberStyles.HexNumber);
-                var to = from;
-                if (m.Groups["t"].Length > 0)
-                {
-                    to = int.Parse(m.Groups["t"].Value, NumberStyles.HexNumber);
-                }
-                var c = m.Groups["c"].Value;
-                data.Add(Tuple.Create(from, to, c));
-            }
-            data.Sort((t1, t2) => t1.Item1 - t2.Item1);
-
-            textWriter.WriteLine("using System.Collections.Generic;");
-            textWriter.WriteLine();
-            textWriter.WriteLine("namespace " + Namespace);
-            textWriter.WriteLine("{");
-            textWriter.WriteLine("\tinternal static partial class UnicodeData");
-            textWriter.WriteLine("\t{");
-            textWriter.WriteLine(
-                "\t\tprivate static readonly List<BidiCategoryRange> BidiCategories = new List<BidiCategoryRange>");
-            textWriter.WriteLine("\t\t{");
-            var first = true;
-            foreach (var item in data)
-            {
-                if (!first)
-                {
-                    textWriter.WriteLine(",");
-                }
-                first = false;
-                textWriter.Write($"\t\t\tnew BidiCategoryRange(0x{item.Item1:x4}, 0x{item.Item2:x4}, BidiCategory.{item.Item3})");
-            }
-            textWriter.WriteLine();
-            textWriter.WriteLine("\t\t};");
-            textWriter.WriteLine("\t}");
-            textWriter.WriteLine("}");
-        }
-
-        private static void WriteBracketsCode(TextWriter textWriter, TextReader textReader)
-        {
-            textWriter.WriteLine("using System.Collections.Generic;");
-            textWriter.WriteLine();
-            textWriter.WriteLine("namespace " + Namespace);
-            textWriter.WriteLine("{");
-            textWriter.WriteLine("\tinternal static partial class UnicodeData");
-            textWriter.WriteLine("\t{");
-            textWriter.WriteLine(
-                "\t\tprivate static readonly Dictionary<int, BracketInfo> BracketData = new Dictionary<int, BracketInfo>");
-            textWriter.WriteLine("\t\t{");
-            var first = true;
-            string line;
-            while ((line = textReader.ReadLine()) != null)
-            {
-                var m = BidiBracketsRegex.Match(line);
-                if (!m.Success) continue;
-                if (!first)
-                {
-                    textWriter.WriteLine(",");
-                }
-                first = false;
-                var key = m.Groups["k"].Value.ToLowerInvariant();
-                var val = m.Groups["v"].Value.ToLowerInvariant();
-                var type = m.Groups["t"].Value == "o" ? "Opening" : "Closing";
-                textWriter.Write($"\t\t\t[0x{key}] = new BracketInfo(0x{val}, BracketType.{type})");
-            }
-            textWriter.WriteLine();
-            textWriter.WriteLine("\t\t};");
-            textWriter.WriteLine("\t}");
-            textWriter.WriteLine("}");
         }
     }
 }
