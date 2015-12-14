@@ -60,6 +60,13 @@ namespace CodeArt.DotnetGD.Libgd
         [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
         public static extern void gdImageFilledEllipse(GdImage* im, int x1, int y1, int w, int h, int color);
 
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern void gdImagePolygon(GdImage* im, Point* pointPtr, int n, int color);
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern void gdImageOpenPolygon(GdImage* im, Point* pointPtr, int n, int color);
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern void gdImageFilledPolygon(GdImage* im, Point* pointPtr, int n, int color);
+
 
         [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
         public static extern void gdImageSetClip(GdImage* im, int x1, int y1, int x2, int y2);

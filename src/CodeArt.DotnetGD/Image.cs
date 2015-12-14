@@ -67,6 +67,15 @@ namespace CodeArt.DotnetGD
             Interlocked.Increment(ref _references);
         }
 
+        /// <summary>
+        /// Returns a pointer to raw pixel data.
+        /// </summary>
+        /// <returns></returns>
+        public void* GetPixels()
+        {
+            CheckObjectDisposed();
+            return ImagePtr->TrueColor == 1 ? ImagePtr->TruecolorPixels : (void*) ImagePtr->Pixels;
+        }
         
 
         private void CheckObjectDisposed()

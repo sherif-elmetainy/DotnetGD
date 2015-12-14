@@ -3,7 +3,6 @@ using System.IO;
 using System.Text;
 using CodeArt.Bidi;
 using CodeArt.DotnetGD.Libgd;
-using DotnetGD;
 using Microsoft.Extensions.PlatformAbstractions;
 
 namespace CodeArt.DotnetGD
@@ -132,8 +131,69 @@ namespace CodeArt.DotnetGD
         }
         #endregion
 
+        #region Polygon methods
+
+        public void DrawPolygon(Point[] points, Color color)
+        {
+            CheckObjectDisposed();
+            fixed (Point* ptr = points)
+            {
+                NativeWrappers.gdImagePolygon(ImagePtr, ptr, points.Length, ResolveColor(color));
+            }
+        }
+
+        public void DrawPolygon(Point[] points, Image brush)
+        {
+            CheckObjectDisposed();
+            SetBrush(brush);
+            fixed (Point* ptr = points)
+            {
+                NativeWrappers.gdImagePolygon(ImagePtr, ptr, points.Length, GdBrushed);
+            }
+        }
+
+        public void DrawOpenPolygon(Point[] points, Color color)
+        {
+            CheckObjectDisposed();
+            fixed (Point* ptr = points)
+            {
+                NativeWrappers.gdImageOpenPolygon(ImagePtr, ptr, points.Length, ResolveColor(color));
+            }
+        }
+
+        public void DrawOpenPolygon(Point[] points, Image brush)
+        {
+            CheckObjectDisposed();
+            SetBrush(brush);
+            fixed (Point* ptr = points)
+            {
+                NativeWrappers.gdImageOpenPolygon(ImagePtr, ptr, points.Length, GdBrushed);
+            }
+        }
+
+        public void DrawFilledPolygon(Point[] points, Color color)
+        {
+            CheckObjectDisposed();
+            fixed (Point* ptr = points)
+            {
+                NativeWrappers.gdImageFilledPolygon(ImagePtr, ptr, points.Length, ResolveColor(color));
+            }
+        }
+
+        public void DrawFilledPolygon(Point[] points, Image tile)
+        {
+            CheckObjectDisposed();
+            SetTile(tile);
+            fixed (Point* ptr = points)
+            {
+                NativeWrappers.gdImageFilledPolygon(ImagePtr, ptr, points.Length, GdTiled);
+            }
+        }
+        #endregion
+
         public void DrawString(string text, Point point, string fontName, double fontSize, double angle, Color color, DrawStringFlags flags = DrawStringFlags.Default)
         {
+            CheckObjectDisposed();
             text = FormatString(text, flags);
             var utf8 = Encoding.UTF8.GetBytes(text);
             NativeWrappers.gdImageStringFT(ImagePtr, null, ResolveColor(color), GetFont(fontName), fontSize, angle, point.X, point.Y, utf8);
@@ -173,6 +233,7 @@ namespace CodeArt.DotnetGD
                 var arabicShaping = new ArabicShaping(options);
                 text = arabicShaping.Shape(text);
             }
+            // ReSharper disable once InvertIf
             if ((flags & DrawStringFlags.RunBidi) != 0)
             {
                 var dir = (flags & DrawStringFlags.IsLtr) != 0

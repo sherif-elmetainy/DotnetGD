@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using CodeArt.DotnetGD.Formatters;
-using DotnetGD;
 using Xunit;
 
 namespace CodeArt.DotnetGD.Tests

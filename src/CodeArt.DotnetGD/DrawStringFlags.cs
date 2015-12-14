@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DotnetGD
+namespace CodeArt.DotnetGD
 {
     /// <summary>
     ///     Draw string flags. These mostly handle RTL languages handling that's not handled properly by LIBGD

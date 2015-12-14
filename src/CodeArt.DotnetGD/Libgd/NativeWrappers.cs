@@ -243,6 +243,27 @@ namespace CodeArt.DotnetGD.Libgd
             CheckForLibgdError();
         }
 
+        public static void gdImagePolygon(GdImage* im, Point* pointPtr, int n, int color)
+        {
+            ResetError();
+            NativeMethods.gdImagePolygon(im, pointPtr, n, color);
+            CheckForLibgdError();
+        }
+
+        public static void gdImageOpenPolygon(GdImage* im, Point* pointPtr, int n, int color)
+        {
+            ResetError();
+            NativeMethods.gdImageOpenPolygon(im, pointPtr, n, color);
+            CheckForLibgdError();
+        }
+
+        public static void gdImageFilledPolygon(GdImage* im, Point* pointPtr, int n, int color)
+        {
+            ResetError();
+            NativeMethods.gdImageFilledPolygon(im, pointPtr, n, color);
+            CheckForLibgdError();
+        }
+
 
         public static void gdImageSetClip(GdImage* im, int x1, int y1, int x2, int y2)
         {

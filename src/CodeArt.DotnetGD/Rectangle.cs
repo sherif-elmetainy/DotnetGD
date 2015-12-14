@@ -2,6 +2,10 @@
 
 namespace CodeArt.DotnetGD
 {
+    /// <summary>
+    /// Rectangle structure.
+    /// Note: This structure is immutable. operations like inflate, intersect, union, etc would return a new rectangle rather than change the instance.
+    /// </summary>
     public struct Rectangle : IEquatable<Rectangle>
     {
         public Rectangle(int x, int y, int width, int height)
@@ -69,10 +73,10 @@ namespace CodeArt.DotnetGD
             unchecked
             {
                 var hash = 17;
-                hash = hash * 31 + Width;
-                hash = hash * 31 + Height;
                 hash = hash * 31 + X;
                 hash = hash * 31 + Y;
+                hash = hash * 31 + Width;
+                hash = hash * 31 + Height;
                 return hash;
             }
         }
@@ -80,6 +84,21 @@ namespace CodeArt.DotnetGD
         public override string ToString()
         {
             return $"({X}, {Y}, {Width}, {Height})";
+        }
+
+        public static Rectangle FromLTRB(int x1, int y1, int x2, int y2)
+        {
+            return new Rectangle(Math.Min(x1, x2), Math.Min(y1, y2), Math.Abs(x1 - x2), Math.Abs(y1 - y2));
+        }
+
+        public static bool operator ==(Rectangle r1, Rectangle r2)
+        {
+            return r1.Equals(r2);
+        }
+
+        public static bool operator !=(Rectangle r1, Rectangle r2)
+        {
+            return !r1.Equals(r2);
         }
     }
 }

@@ -286,7 +286,7 @@ namespace CodeArt.DotnetGD.Libgd
         /* Truecolor flag and Pixels. New 2.0 fields appear here at the
            end to minimize breakage of existing object code. */
         public int TrueColor;
-        public int** Tpixels;
+        public int** TruecolorPixels;
         /* Should alpha channel be copied, or applied, each time a
            pixel is drawn? This applies to truecolor images only.
            No attempt is made to alpha-blend in palette images,
