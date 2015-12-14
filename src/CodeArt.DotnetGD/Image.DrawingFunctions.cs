@@ -213,6 +213,7 @@ namespace CodeArt.DotnetGD
             }
             if (!File.Exists(fontName))
                 throw new FileNotFoundException("Font file was not found.", fontName);
+            
             return fontName;
         }
 

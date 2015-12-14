@@ -13,6 +13,8 @@ namespace CodeArt.DotnetGD.Libgd
 
         [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
         public static extern void gdSetErrorMethod(IntPtr functionPointer);
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdFontCacheSetup();
 
         // Creation and destruction functions
         [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]

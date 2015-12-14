@@ -52,6 +52,7 @@ namespace CodeArt.DotnetGD.Libgd
         public static void InitializeLibGd()
         {
             NativeMethods.gdSetErrorMethod(Marshal.GetFunctionPointerForDelegate<LibgdErrorCallbackDelegate>(LibgdErrorCallback));
+            NativeMethods.gdFontCacheSetup();
         }
 
         /// <summary>
