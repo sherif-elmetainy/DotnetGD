@@ -100,12 +100,13 @@ namespace CodeArt.DotnetGD
             NativeWrappers.gdImageEllipse(ImagePtr, center.X, center.Y, size.Width, size.Height, resolvedColor);
         }
 
-        public void DrawEllipse(Point center, Size size, Pen pen)
-        {
-            CheckObjectDisposed();
-            SetPen(pen);
-            NativeWrappers.gdImageEllipse(ImagePtr, center.X, center.Y, size.Width, size.Height, GdStyled);
-        }
+        // Removed because style works with line drawing functions (gdImageLine, gdImageRectangle, gdImagePolygon, etc)
+        //public void DrawEllipse(Point center, Size size, Pen pen)
+        //{
+        //    CheckObjectDisposed();
+        //    SetPen(pen);
+        //    NativeWrappers.gdImageEllipse(ImagePtr, center.X, center.Y, size.Width, size.Height, GdStyled);
+        //}
 
         public void DrawEllipse(Point center, Size size, Image brush)
         {
