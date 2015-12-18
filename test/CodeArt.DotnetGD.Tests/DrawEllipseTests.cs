@@ -8,18 +8,14 @@ namespace CodeArt.DotnetGD.Tests
         [PixelFormatsData]
         public void DrawEllipse(PixelFormat format)
         {
-            using (var image = new Image(21, 21, format))
-            {
-                var red = new Color(0xff, 0, 0);
-                var blue = new Color(0, 0, 0xff);
-
-                var center = new Point(10, 10);
-                var size = new Size(20, 20);
-                image.DrawEllipse(center, size, red);
-                image.DrawFilledEllipse(center, new Size(19, 19), blue);
+            using (var image = TestCommon.CreateImageWhiteBackground(format))
+            { 
+                var center = new Point(image.Width / 2, image.Height / 2);
+                var size = new Size(image.Width - 30, image.Height - 30);
+                image.DrawEllipse(center, size, Color.Red);
+                image.DrawFilledEllipse(center, size.Deflate(20, 20), Color.Blue);
                 
-                Assert.Equal(red, image.GetPixel(10, 0));
-                Assert.Equal(blue, image.GetPixel(10, 1));
+                image.CompareToReferenceImage(format.ToString());
             }
         }
 
@@ -27,19 +23,14 @@ namespace CodeArt.DotnetGD.Tests
         [PixelFormatsData]
         public void DrawDashedEllipse(PixelFormat format)
         {
-            using (var image = new Image(21, 21, format))
+            Assert.True(false, "Need to check libgd Styled drawing for Ellipses");
+            using (var image = TestCommon.CreateImageWhiteBackground(format))
             {
-                var red = new Color(0xff, 0, 0);
-                var blue = new Color(0, 0, 0xff);
-
-                var pen = new Pen(1, new[] { red, red, red, blue, blue });
-                var center = new Point(10, 10);
-                var size = new Size(20, 20);
+                var center = new Point(image.Width / 2, image.Height / 2);
+                var size = new Size(image.Width - 30, image.Height - 30);
+                var pen = new Pen(4, new[] { Color.Red, Color.Blue });
                 image.DrawEllipse(center, size, pen);
-
-                
-                Assert.Equal(red, image.GetPixel(9, 0));
-                Assert.Equal(blue, image.GetPixel(11, 0));
+                image.CompareToReferenceImage(format.ToString());
             }
         }
 
@@ -47,26 +38,15 @@ namespace CodeArt.DotnetGD.Tests
         [PixelFormatsData]
         public void DrawTiledEllipse(PixelFormat format)
         {
-            using (var image = new Image(20, 20, format))
+            using (var image = TestCommon.CreateImageWhiteBackground(format))
             {
-                var red = new Color(0xff, 0, 0);
-                var blue = new Color(0, 0, 0xff);
-                
-                using (var tile = new Image(2, 2))
+                using (var tile = TestCommon.CreateCheckerTile())
                 {
-                    tile.SetPixel(0, 0, red);
-                    tile.SetPixel(1, 1, red);
-                    tile.SetPixel(0, 1, blue);
-                    tile.SetPixel(1, 0, blue);
-                    var center = new Point(10, 10);
-                    var size = new Size(20, 20);
+                    var center = new Point(image.Width / 2, image.Height / 2);
+                    var size = new Size(image.Width - 30, image.Height - 30);
                     image.DrawFilledEllipse(center, size, tile);
                 }
-
-               
-
-                Assert.Equal(red, image.GetPixel(10, 0));
-                Assert.Equal(blue, image.GetPixel(9, 0));
+                image.CompareToReferenceImage(format.ToString());
             }
         }
 
@@ -74,25 +54,16 @@ namespace CodeArt.DotnetGD.Tests
         [PixelFormatsData]
         public void DrawBrushedEllipse(PixelFormat format)
         {
-            using (var image = new Image(20, 20, format))
+            using (var image = TestCommon.CreateImageWhiteBackground(format))
             {
-                var red = new Color(0xff, 0, 0);
-                var blue = new Color(0, 0, 0xff);
-
-                using (var brush = new Image(1, 3))
+                using (var brush = TestCommon.CreateRgbBrush())
                 {
-                    brush.SetPixel(0, 0, red);
-                    brush.SetPixel(0, 1, blue);
-                    brush.SetPixel(0, 2, red);
-
-                    var center = new Point(10, 10);
-                    var size = new Size(20, 20);
+                    var center = new Point(image.Width / 2, image.Height / 2);
+                    var size = new Size(image.Width - 30, image.Height - 30);
                     image.DrawEllipse(center, size, brush);
                 }
 
-                Assert.Equal(red, image.GetPixel(10, 1));
-                Assert.Equal(blue, image.GetPixel(10, 0));
-               
+                image.CompareToReferenceImage(format.ToString());
             }
         }
     }

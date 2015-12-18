@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using CodeArt.DotnetGD;
 using CodeArt.DotnetGD.Formatters;
 using CodeArt.DotnetGD.Libgd;
 using Xunit;
@@ -123,12 +122,12 @@ namespace CodeArt.DotnetGD.Tests
 
         private static void WriteNullImageToFile(IImageFormatter formatter)
         {
-            formatter.WriteImageToFile(null, "test" + formatter.DefaultExtension);
+            formatter.WriteImageToFile(null, Path.ChangeExtension("test", formatter.DefaultExtension));
         }
 
         private static Task WriteNullImageToFileAsync(IImageFormatter formatter)
         {
-            return formatter.WriteImageToFileAsync(null, "test" + formatter.DefaultExtension);
+            return formatter.WriteImageToFileAsync(null, Path.ChangeExtension("test", formatter.DefaultExtension));
         }
 
         private static void WriteNullImageToStream(IImageFormatter formatter)
@@ -203,7 +202,7 @@ namespace CodeArt.DotnetGD.Tests
                 image.DrawRectangle(new Rectangle(20, 20, 59, 59), green);
                 image.DrawEllipse(new Point(70, 25), new Size(30, 20), blue);
 
-                var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n") + "." + formatter.DefaultExtension);
+                var path = Path.Combine(Path.GetTempPath(), Path.ChangeExtension(Guid.NewGuid().ToString("n"), formatter.DefaultExtension));
                 try
                 {
                     formatter.WriteImageToFile(image, path);
@@ -295,7 +294,7 @@ namespace CodeArt.DotnetGD.Tests
                 image.DrawFilledRectangle(new Rectangle(0, 0, 99, 99), red);
                 image.DrawRectangle(new Rectangle(20, 20, 59, 59), green);
                 image.DrawEllipse(new Point(70, 25), new Size(30, 20), blue);
-                var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n") + "." + gif.DefaultExtension);
+                var path = Path.Combine(Path.GetTempPath(), Path.ChangeExtension(Guid.NewGuid().ToString("n"), gif.DefaultExtension));
                 try
                 {
                     using (var fs = File.Create(path))

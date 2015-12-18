@@ -142,6 +142,16 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        public void DrawPolygon(Point[] points, Pen pen)
+        {
+            CheckObjectDisposed();
+            SetPen(pen);
+            fixed (Point* ptr = points)
+            {
+                NativeWrappers.gdImagePolygon(ImagePtr, ptr, points.Length, GdStyled);
+            }
+        }
+
         public void DrawPolygon(Point[] points, Image brush)
         {
             CheckObjectDisposed();
