@@ -30,7 +30,7 @@ namespace CodeArt.DotnetGD.Formatters
         private static readonly IReadOnlyList<string> SupportedExtensionsList = new ReadOnlyCollection<string>(
                 new []
                 {
-                    "tiff", "tif"
+                    ".tiff", ".tif"
                 }
             );
 

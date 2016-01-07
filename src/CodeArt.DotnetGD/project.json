@@ -7,6 +7,7 @@
   "licenseUrl": "https://github.com/sherif-elmetainy/DotnetGD/blob/master/LICENSE.txt",
   "copyright": "Copyright (c) 2015 Sherif Elmetainy (Code Art)",
   "dependencies": {
+    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0-rc1-final",
     "CodeArt.Bidi": "1.0.0-*"
   },
   "frameworks": {

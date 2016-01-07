@@ -91,14 +91,10 @@ namespace CodeArt.DotnetGD
             return new Rectangle(Math.Min(x1, x2), Math.Min(y1, y2), Math.Abs(x1 - x2), Math.Abs(y1 - y2));
         }
 
-        public static bool operator ==(Rectangle r1, Rectangle r2)
-        {
-            return r1.Equals(r2);
-        }
+        public static bool operator ==(Rectangle r1, Rectangle r2) => r1.Equals(r2);
 
-        public static bool operator !=(Rectangle r1, Rectangle r2)
-        {
-            return !r1.Equals(r2);
-        }
+
+        public static bool operator !=(Rectangle r1, Rectangle r2) => !r1.Equals(r2);
+
     }
 }

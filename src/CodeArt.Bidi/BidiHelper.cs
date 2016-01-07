@@ -16,7 +16,7 @@ namespace CodeArt.Bidi
                                                  || ((c >= 0x2066) && (c <= 0x2069)));
         }
 
-        private static readonly char[] LineBreakChars = new[] {'\r', '\n'};
+        private static readonly char[] LineBreakChars = {'\r', '\n'};
         public static string FormatString(string str, ParagraphDirection dir)
         {
             var sb = new StringBuilder(str.Length);

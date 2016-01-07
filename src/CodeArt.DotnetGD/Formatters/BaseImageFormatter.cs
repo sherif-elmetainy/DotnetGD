@@ -24,7 +24,7 @@ namespace CodeArt.DotnetGD.Formatters
             if (image == null) throw new ArgumentNullException(nameof(image));
             using (var fs = File.Create(fileName))
             {
-                await WriteImageToStreamAsync(image, fs);
+                await WriteImageToStreamAsync(image, fs).ConfigureAwait(false);
             }
         }
 
@@ -88,7 +88,7 @@ namespace CodeArt.DotnetGD.Formatters
             if (string.IsNullOrEmpty(fileName)) throw new ArgumentNullException(nameof(fileName));
             using (var fs = File.OpenRead(fileName))
             {
-                return await ReadImageFromStreamAsync(fs);
+                return await ReadImageFromStreamAsync(fs).ConfigureAwait(false);
             }
         }
 

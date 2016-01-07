@@ -57,7 +57,7 @@ namespace CodeArt.DotnetGD.Formatters
         private static readonly IReadOnlyList<string> SupportedExtensionsList = new ReadOnlyCollection<string>(
                 new []
                 {
-                    "jpg", "jpeg", "jpe", "jif", "jfif", "jfi"
+                    ".jpg", ".jpeg", ".jpe", ".jif", ".jfif", ".jfi"
                 }
             );
 

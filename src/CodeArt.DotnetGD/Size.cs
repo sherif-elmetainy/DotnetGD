@@ -43,5 +43,14 @@ namespace CodeArt.DotnetGD
         {
             return $"({Width}, {Height})";
         }
+
+        public static bool operator ==(Size s1, Size s2) => s1.Equals(s2);
+        public static bool operator !=(Size s1, Size s2) => !s1.Equals(s2);
+
+        public static Size operator +(Size s1, Size s2) => new Size(s1.Width + s2.Width, s1.Height + s2.Height);
+        public static Size operator -(Size s1, Size s2) => new Size(s1.Width - s2.Width, s1.Height - s2.Height);
+        public static Size operator *(int scale, Size s) => new Size(scale * s.Width, scale * s.Height);
+        public static Size operator *(Size s, int scale) => new Size(s.Width * scale, s.Height * scale);
+        public static Size operator /(Size s, int scale) => new Size(s.Width / scale, s.Height / scale);
     }
 }

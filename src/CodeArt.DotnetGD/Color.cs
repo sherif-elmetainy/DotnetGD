@@ -5,6 +5,20 @@ namespace CodeArt.DotnetGD
     /// <summary>
     /// Color structure (similar to the one used in System.Drawing)
     /// </summary>
+    /// <remarks>
+    ///     In libgd true color is represented as 32 bit signed integer. The sign bit is ignored and always zero.
+    ///     Also in libgd alpha = 0 means opaque while alpha = 0x7f means transparent. 
+    ///     This Color structure has alpha=0 means transparent and alpha = 0xff means opaque. 
+    ///     The reason behind the difference is that most .NET developers are familiar with Color structure in System.Drawing
+    ///     and also because in HTML alpha=0xff also means opaque. Since the target audience of this wrapper is most likely developing
+    ///     web application for ASP.NET 5 and/or a .NET developer familiar Color in system.Drawing, I choose to make it different than libgd 
+    ///     and have the library internally convert the alpha part.
+    /// 
+    ///     The above is only relevant in because of the following:
+    ///     1- There is a small loss in alpha resolution cause by libgd (it's 7 bits instead of 8 bits)
+    ///     2- When accessing image raw pointer, colors will not work like this structurce and will rather be libgd true color in case of truecolor image
+    ///     and color index in case of non true color images.
+    /// </remarks>
     public struct Color : IEquatable<Color>
     {
         private const byte AlphaOpaque = 0xff;
@@ -32,7 +46,7 @@ namespace CodeArt.DotnetGD
 
         public Color(string htmlColor)
         {
-            Argb = ColorNameConverter.FromHtmlColor(htmlColor).Argb;
+            this = ColorNameConverter.FromHtmlColor(htmlColor);
         }
 
         public override bool Equals(object obj)

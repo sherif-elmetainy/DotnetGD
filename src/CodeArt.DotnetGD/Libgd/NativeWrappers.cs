@@ -23,6 +23,8 @@ namespace CodeArt.DotnetGD.Libgd
         
         // As a REALLY UGLY workaround, I have the managed handler write the error message to a thread static variable.
 
+        private const int Notice = 5;
+
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void LibgdErrorCallbackDelegate(
             int priority, [MarshalAs(UnmanagedType.LPStr)] string message);
@@ -43,6 +45,8 @@ namespace CodeArt.DotnetGD.Libgd
         /// <param name="message"></param>
         private static void LibgdErrorCallback(int priority, string message)
         {
+            if (priority >= Notice)
+                return;
             _currentError = message;
         }
 
@@ -52,7 +56,16 @@ namespace CodeArt.DotnetGD.Libgd
         public static void InitializeLibGd()
         {
             NativeMethods.gdSetErrorMethod(Marshal.GetFunctionPointerForDelegate<LibgdErrorCallbackDelegate>(LibgdErrorCallback));
-            NativeMethods.gdFontCacheSetup();
+            
+            // Calling this during initialization because of the following (comment copied from gd.h)
+            /* 2.0.16: for thread-safe use of gdImageStringFT and friends,
+            call this before allowing any thread to call gdImageStringFT.
+            Otherwise it is invoked by the first thread to invoke
+            gdImageStringFT, with a very small but real risk of a race condition.
+            Return 0 on success, nonzero on failure to initialize freetype. */
+            int result = NativeMethods.gdFontCacheSetup();
+            if (result != 0)
+                ThrowLibgdException($"Failed to initialize font cache. Call result: {result}.", nameof(NativeMethods.gdFontCacheSetup));
         }
 
         /// <summary>
@@ -531,6 +544,108 @@ namespace CodeArt.DotnetGD.Libgd
             var res = NativeMethods.gdImageCreateFromWebpPtr(size, data);
             CheckImageResult(res);
             return res;
+        }
+
+        // Copy methods
+        public static void gdImageCopy(GdImage* dst, GdImage* src, int dstX, int dstY, int srcX, int srcY, int w, int h)
+        {
+            ResetError();
+            NativeMethods.gdImageCopy(dst, src, dstX, dstY, srcX, srcY, w, h);
+            CheckForLibgdError();
+        }
+
+        public static void gdImageCopyMerge(GdImage* dst, GdImage* src, int dstX, int dstY, int srcX, int srcY, int w, int h, int pct)
+        {
+            ResetError();
+            NativeMethods.gdImageCopyMerge(dst, src, dstX, dstY, srcX, srcY, w, h, pct);
+            CheckForLibgdError();
+        }
+
+        public static void gdImageCopyMergeGray(GdImage* dst, GdImage* src, int dstX, int dstY, int srcX, int srcY,
+            int w, int h, int pct)
+        {
+            ResetError();
+            NativeMethods.gdImageCopyMergeGray(dst, src, dstX, dstY, srcX, srcY, w, h, pct);
+            CheckForLibgdError();
+        }
+
+        public static void gdImageCopyResized(GdImage* dst, GdImage* src, int dstX, int dstY, int srcX, int srcY, int dstW, int dstH, int srcW, int srcH)
+        {
+            ResetError();
+            NativeMethods.gdImageCopyResized(dst, src, dstX, dstY, srcX, srcY, dstW, dstH, srcW, srcH);
+            CheckForLibgdError();
+        }
+
+        public static void gdImageCopyResampled(GdImage* dst, GdImage* src, int dstX, int dstY, int srcX, int srcY,
+            int dstW, int dstH, int srcW, int srcH)
+        {
+            ResetError();
+            NativeMethods.gdImageCopyResampled(dst, src, dstX, dstY, srcX, srcY, dstW, dstH, srcW, srcH);
+            CheckForLibgdError();
+        }
+
+        public static void gdImageCopyRotated(GdImage* dst, GdImage* src, double dstX, double dstY, int srcX, int srcY,
+            int srcW, int srcH, int angle)
+        {
+            ResetError();
+            NativeMethods.gdImageCopyRotated(dst, src, dstX, dstY, srcX, srcY, srcW, srcH, angle);
+            CheckForLibgdError();
+        }
+
+        public static GdImage* gdImageClone(GdImage* src)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageClone(src);
+            CheckImageResult(res);
+            return res;
+        }
+
+        // Palette <-> True color methods
+        public static int gdImageTrueColorToPalette(GdImage* im, int ditherFlag, int colorsWanted)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageTrueColorToPalette(im, ditherFlag, colorsWanted);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdImagePaletteToTrueColor(GdImage* src)
+        {
+            ResetError();
+            var res = NativeMethods.gdImagePaletteToTrueColor(src);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdImageColorMatch(GdImage* oringialImage, GdImage* targetImage)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageColorMatch(oringialImage, targetImage);
+            CheckForLibgdError();
+            if (res != 0)
+                ThrowException($"Method returned {res}.");
+            return res;
+        }
+
+        public static int gdImageTrueColorToPaletteSetMethod(GdImage* im, int method, int speed)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageTrueColorToPaletteSetMethod(im, method, speed);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static void gdImageTrueColorToPaletteSetQuality(GdImage* im, int minQuality, int maxQuality)
+        {
+            ResetError();
+            NativeMethods.gdImageTrueColorToPaletteSetQuality(im, minQuality, maxQuality);
+            CheckForLibgdError();
         }
         // ReSharper restore InconsistentNaming
     }

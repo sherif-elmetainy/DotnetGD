@@ -160,6 +160,46 @@ namespace CodeArt.DotnetGD.Libgd
         public static extern GdImage* gdImageCreateFromWebpCtx(GdIoCtx* input);
         [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
         public static extern GdImage* gdImageCreateFromWebpPtr(int size, IntPtr data);
+
+
+        // Copy methods
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern void gdImageCopy(GdImage* dst, GdImage* src, int dstX, int dstY, int srcX, int srcY, int w, int h);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern void gdImageCopyMerge(GdImage* dst, GdImage* src, int dstX, int dstY, int srcX, int srcY, int w, int h, int pct);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern void gdImageCopyMergeGray(GdImage* dst, GdImage* src, int dstX, int dstY, int srcX, int srcY, int w, int h, int pct);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern void gdImageCopyResized(GdImage* dst, GdImage* src, int dstX, int dstY, int srcX, int srcY, int dstW, int dstH, int srcW, int srcH);
+
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern void gdImageCopyResampled(GdImage* dst, GdImage* src, int dstX, int dstY, int srcX, int srcY, int dstW, int dstH, int srcW, int srcH);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern void gdImageCopyRotated(GdImage* dst, GdImage* src, double dstX, double dstY, int srcX, int srcY, int srcW, int srcH, int angle);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern GdImage* gdImageClone(GdImage* src);
+
+        // Palette <-> True color methods
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageTrueColorToPalette(GdImage* im, int ditherFlag, int colorsWanted);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImagePaletteToTrueColor(GdImage* src);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageColorMatch(GdImage* im1, GdImage* im2);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageTrueColorToPaletteSetMethod(GdImage* im, int method, int speed);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern void gdImageTrueColorToPaletteSetQuality(GdImage* im, int minQuality, int maxQuality);
     }
 
 

@@ -2,7 +2,7 @@
 
 namespace CodeArt.Bidi
 {
-    public class BidiStringInfo
+    internal class BidiStringInfo
     {
         public BidiStringInfo(string str)
         {

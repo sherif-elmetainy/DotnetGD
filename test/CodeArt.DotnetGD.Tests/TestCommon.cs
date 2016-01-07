@@ -37,6 +37,12 @@ namespace CodeArt.DotnetGD.Tests
             return brush;
         }
 
+        internal static Image GetTestImage(string name)
+        {
+            var basePath = PlatformServices.Default.Application.ApplicationBasePath;
+            var imagePath = Path.Combine(basePath, "TestImages", name);
+            return ImageFormatter.ReadImageFromFile(imagePath);
+        }
 
         private static void CompareToReferenceImageInternal(Image image, string referenceImage)
         {

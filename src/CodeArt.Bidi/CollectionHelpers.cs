@@ -7,7 +7,7 @@ namespace CodeArt.Bidi
     /// <summary>
     ///  Helper classes to emulate behaviors of java collections in dotnet
     /// </summary>
-    public static class CollectionHelpers
+    internal static class CollectionHelpers
     {
         public static T[] ArrayCopyOf<T>(this T[] array, int newLength)
         {

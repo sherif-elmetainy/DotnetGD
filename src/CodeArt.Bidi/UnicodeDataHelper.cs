@@ -1,7 +1,7 @@
 ﻿namespace CodeArt.Bidi
 {
     /// <summary>
-    ///     Helper class for reading and writing unicode data to Unicode.data inclded in the library
+    ///     Helper class for reading and writing unicode data to Unicode.dat included in the library
     /// </summary>
     internal static class UnicodeDataHelper
     {

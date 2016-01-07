@@ -47,7 +47,7 @@ namespace CodeArt.DotnetGD.Formatters
         private static readonly IReadOnlyList<string> SupportedExtensionsList = new ReadOnlyCollection<string>(
                 new []
                 {
-                    "bmp", "dib"
+                    ".bmp", ".dib"
                 }
             );
 

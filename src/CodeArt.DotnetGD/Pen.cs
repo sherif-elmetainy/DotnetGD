@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace CodeArt.DotnetGD
 {
+    /// <summary>
+    /// Pen style for drawing lines, rectangles and polygons
+    /// </summary>
     public sealed class Pen : IEquatable<Pen>
     {
         public Pen(int thickness, IEnumerable<Color> dashColors)

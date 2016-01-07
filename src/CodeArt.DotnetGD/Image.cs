@@ -12,7 +12,7 @@ namespace CodeArt.DotnetGD
     /// however the most typical use would not have the Image used in multiple threads. 
     /// So I would rather have this warning here and leave it up to the consumer to use locks if needed.
     /// 
-    /// It is theoritically safe to  have multiple threads read the Image instance 
+    /// It is theoritically safe to have multiple threads read the Image instance 
     /// (For example having the image in a static field and using it as a brush or a tile for other images).
     /// 
     /// So if you are going to use multiple threads to write to the image (very uncommon scenario), then locks must be used.
@@ -33,8 +33,8 @@ namespace CodeArt.DotnetGD
 
         public const int PaletteQuantizationSpeedBestQuality = 1;
         public const int PaletteQuantizationSpeedBestSpeed = 10;
-        public const int PaletteQuantizationUgly = 1;
-        public const int PaletteQuantizationPerfect = 100;
+        //public const int PaletteQuantizationUgly = 1;
+        //public const int PaletteQuantizationPerfect = 100;
 
         public Image(int width, int height, PixelFormat pixelFormat = PixelFormat.Format32BppArgb)
         {
