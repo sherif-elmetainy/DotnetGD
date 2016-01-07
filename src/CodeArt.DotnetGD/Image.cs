@@ -36,6 +36,22 @@ namespace CodeArt.DotnetGD
         //public const int PaletteQuantizationUgly = 1;
         //public const int PaletteQuantizationPerfect = 100;
 
+        /// <summary>
+        /// Creates a new instance of <see cref="Image" />
+        /// </summary>
+        /// <param name="size">size of the image</param>
+        /// <param name="pixelFormat">format of the image (true color or 256 color indexed)</param>
+        public Image(Size size, PixelFormat pixelFormat = PixelFormat.Format32BppArgb) : this(size.Width, size.Height, pixelFormat)
+        {
+
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="Image" />
+        /// </summary>
+        /// <param name="width">width of the image</param>
+        /// <param name="height">height of the image</param>
+        /// <param name="pixelFormat">format of the image (true color or 256 color indexed)</param>
         public Image(int width, int height, PixelFormat pixelFormat = PixelFormat.Format32BppArgb)
         {
             if (width <= 0)
@@ -51,12 +67,19 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// internal constructor to create image given a libgd image pointer
+        /// </summary>
+        /// <param name="imagePtrPtr"></param>
         internal Image(GdImage* imagePtrPtr)
         {
             if (imagePtrPtr == null) throw new ArgumentNullException(nameof(imagePtrPtr));
             ImagePtr = imagePtrPtr;
         }
 
+        /// <summary>
+        /// Finalized to clean native resources (in case dispose was not called)
+        /// </summary>
         ~Image()
         {
             Dispose(false);
@@ -74,9 +97,9 @@ namespace CodeArt.DotnetGD
         public void* GetPixels()
         {
             CheckObjectDisposed();
-            return ImagePtr->TrueColor == 1 ? ImagePtr->TruecolorPixels : (void*) ImagePtr->Pixels;
+            return ImagePtr->TrueColor == 1 ? ImagePtr->TruecolorPixels : (void*)ImagePtr->Pixels;
         }
-        
+
 
         private void CheckObjectDisposed()
         {
@@ -84,6 +107,9 @@ namespace CodeArt.DotnetGD
                 throw new ObjectDisposedException(nameof(GdImage));
         }
 
+        /// <summary>
+        /// Gets image width
+        /// </summary>
         public int Width
         {
             get
@@ -93,6 +119,9 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// Gets image height
+        /// </summary>
         public int Height
         {
             get
@@ -102,6 +131,14 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// Gets image size
+        /// </summary>
+        public Size Size => new Size(Width, Height);
+
+        /// <summary>
+        /// Gets image format
+        /// </summary>
         public PixelFormat PixelFormat
         {
             get
@@ -111,6 +148,9 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// Gets or sets image horizontal resolution (dpi)
+        /// </summary>
         public uint ResolutionX
         {
             get
@@ -127,6 +167,9 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// gets or sets image vertical resolution (dpi)
+        /// </summary>
         public uint ResolutionY
         {
             get
@@ -159,6 +202,14 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// Gets image bounds
+        /// </summary>
+        public Rectangle Bounds => new Rectangle(new Point(), Size);
+
+        /// <summary>
+        /// Gets or sets image's clip rectangle
+        /// </summary>
         public Rectangle ClipRectangle
         {
             get
@@ -192,7 +243,11 @@ namespace CodeArt.DotnetGD
                 NativeWrappers.gdImageSetClip(ImagePtr, value.Left, value.Top, value.Right, value.Bottom);
             }
         }
-        
+
+        /// <summary>
+        /// Dispose of the image cleaning all native resources
+        /// </summary>
+        /// <param name="isDisposing"></param>
         private void Dispose(bool isDisposing)
         {
             var image = ImagePtr;
@@ -208,6 +263,9 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// dispose of the image cleaning all native resources
+        /// </summary>
         public void Dispose()
         {
             if (Interlocked.Decrement(ref _references) <= 0)

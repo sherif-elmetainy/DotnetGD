@@ -12,6 +12,7 @@ namespace CodeArt.DotnetGD.Tests
         [InlineData("مرحبا بالعالم!", "HelloWorldAr", DrawStringFlags.RunBidi | DrawStringFlags.ArabicShaping)]
         [InlineData("مَرْحَبَاً بِالْعَالَمِ!", "HelloWorldArTashkeel", DrawStringFlags.RunBidi | DrawStringFlags.ArabicShaping)]
         [InlineData("مَرْحَبَاً بِالْعَالَمِ!", "HelloWorldArRemoveTashkeel", DrawStringFlags.RunBidi | DrawStringFlags.ArabicShaping | DrawStringFlags.RemoveArabicTashkeel)]
+        [InlineData("12345", "ArabicNumbers", DrawStringFlags.ArabicShaping | DrawStringFlags.ShapeArabicNumbers)]
         public void DrawText(string text, string referenceImage, DrawStringFlags flags)
         {
             using (var image = TestCommon.CreateImageWhiteBackground())

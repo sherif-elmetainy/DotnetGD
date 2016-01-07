@@ -192,8 +192,8 @@ namespace CodeArt.DotnetGD.Libgd
         [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
         public static extern int gdImagePaletteToTrueColor(GdImage* src);
 
-        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
-        public static extern int gdImageColorMatch(GdImage* im1, GdImage* im2);
+        //[DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        //public static extern int gdImageColorMatch(GdImage* im1, GdImage* im2);
 
         [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
         public static extern int gdImageTrueColorToPaletteSetMethod(GdImage* im, int method, int speed);

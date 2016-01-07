@@ -8,6 +8,8 @@ namespace CodeArt.DotnetGD
         {
             if (other == null)
                 return ImageCompareResult.All;
+            CheckObjectDisposed();
+            other.CheckObjectDisposed();
             return ReferenceEquals(this, other) ? ImageCompareResult.Similar : NativeWrappers.gdImageCompare(ImagePtr, other.ImagePtr);
         }
 

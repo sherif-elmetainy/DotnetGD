@@ -63,6 +63,27 @@ namespace CodeArt.DotnetGD.Tests
             }
         }
 
+        //[Theory]
+        //[InlineData("Test_1.png")]
+        //public void ColorMatch(string fileName)
+        //{
+        //    using (var img = TestCommon.GetTestImage(fileName))
+        //    {
+        //        using (var clone256 = img.Copy(PixelFormat.Format8BppIndexed))
+        //        {
+        //            using (var clone64 = img.Copy(PixelFormat.Format8BppIndexed, numberOfColorsWanted: 64))
+        //            {
+        //                var result = clone64.CompareTo(clone256);
+        //                Assert.Equal(ImageCompareResult.Color | ImageCompareResult.Image | ImageCompareResult.NumberOfColors, result);
+
+        //                clone64.ColorMatch(clone256);
+        //                result = clone64.CompareTo(clone256);
+        //                Assert.Equal(ImageCompareResult.Similar, result);
+        //            }
+        //        }
+        //    }
+        //}
+
         [Theory]
         [InlineData("Test_2.png")]
         public void PalleteToTrueColor(string fileName)

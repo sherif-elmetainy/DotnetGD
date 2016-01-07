@@ -28,7 +28,7 @@ namespace CodeArt.DotnetGD.Formatters
                     && t.HasPublicDefaultConstructor())
             .Select(t => (IImageFormatter)Activator.CreateInstance(t)).ToList());
 
-        public static IImageFormatter GetFormatterForFile(this IServiceProvider serviceProvider, string fileName)
+        public static IImageFormatter GetImageFormatterForFile(this IServiceProvider serviceProvider, string fileName)
             => GetFormatterForFile(serviceProvider.GetImageFormatters(), fileName);
 
         public static IImageFormatter GetFormatterForFile(string fileName)

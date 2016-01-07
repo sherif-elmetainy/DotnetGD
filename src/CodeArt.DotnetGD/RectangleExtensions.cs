@@ -16,6 +16,8 @@ namespace CodeArt.DotnetGD
                                                                              && other.Y >= rect.Y
                                                                              && other.Bottom <= rect.Bottom;
 
+        public static bool IsContainedIn(this Rectangle rect, Rectangle other) => other.Contains(rect);
+
         public static Rectangle Inflate(this Rectangle rect, int width, int height) => new Rectangle(rect.X - width, rect.Y - height, rect.Width + 2 * width, rect.Height + 2 * height);
 
         public static Rectangle Inflate(this Rectangle rect, Size size) => rect.Inflate(size.Width, size.Height);

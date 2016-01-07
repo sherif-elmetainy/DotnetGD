@@ -621,15 +621,15 @@ namespace CodeArt.DotnetGD.Libgd
             return res;
         }
 
-        public static int gdImageColorMatch(GdImage* oringialImage, GdImage* targetImage)
-        {
-            ResetError();
-            var res = NativeMethods.gdImageColorMatch(oringialImage, targetImage);
-            CheckForLibgdError();
-            if (res != 0)
-                ThrowException($"Method returned {res}.");
-            return res;
-        }
+        //public static int gdImageColorMatch(GdImage* originalImage, GdImage* targetImage)
+        //{
+        //    ResetError();
+        //    var res = NativeMethods.gdImageColorMatch(originalImage, targetImage);
+        //    CheckForLibgdError();
+        //    if (res != 0)
+        //        ThrowException($"Method returned {res}.");
+        //    return res;
+        //}
 
         public static int gdImageTrueColorToPaletteSetMethod(GdImage* im, int method, int speed)
         {

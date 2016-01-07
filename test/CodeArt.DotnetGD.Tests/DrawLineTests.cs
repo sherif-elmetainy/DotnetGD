@@ -2,7 +2,7 @@
 
 namespace CodeArt.DotnetGD.Tests
 {
-    public class LineDrawingTests
+    public class DrawLineTests
     {
         [Theory]
         [PixelFormatsData]

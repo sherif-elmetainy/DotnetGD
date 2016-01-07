@@ -5,12 +5,25 @@ namespace CodeArt.DotnetGD
 {
     public unsafe partial class Image
     {
+        /// <summary>
+        /// Clones the image. The target image will have same size, same number of colors (in case of 8-bit indexed) and same pixels.
+        /// </summary>
+        /// <returns></returns>
         public Image Clone()
         {
+            CheckObjectDisposed();
             var ptr = NativeWrappers.gdImageClone(ImagePtr);
             return new Image(ptr);
         }
 
+        /// <summary>
+        /// Changes the format of an image. 
+        /// </summary>
+        /// <param name="newPixelFormat">The new image format. If the image format is the same, the method does nothing.</param>
+        /// <param name="quantizationMethod">Quantization method to use when converting from truecolor to 8-bit. This is ignored when converting to true color.</param>
+        /// <param name="quantizationSpeed">Quantization speed to use when converting from truecolor to 8-bit. This is ignored when converting to true color.</param>
+        /// <param name="dither">Dither flag to use when converting from truecolor to 8-bit. This is ignored when converting to true color.</param>
+        /// <param name="numberOfColorsWanted">Number of target colors to use when converting from truecolor to 8-bit. This is ignored when converting to true color.</param>
         public void ChangeFormat(PixelFormat newPixelFormat,
             PaletteQuantizationMethod quantizationMethod = PaletteQuantizationMethod.Default,
             int quantizationSpeed = PaletteQuantizationSpeedBestQuality,
@@ -21,6 +34,9 @@ namespace CodeArt.DotnetGD
         {
             if (newPixelFormat != PixelFormat.Format8BppIndexed && newPixelFormat != PixelFormat.Format32BppArgb)
                 throw new ArgumentOutOfRangeException(nameof(newPixelFormat), newPixelFormat, "Invalid pixel format.");
+            CheckObjectDisposed();
+            if (newPixelFormat == PixelFormat)
+                return;
             if (newPixelFormat == PixelFormat.Format8BppIndexed)
             {
                 if (quantizationMethod < PaletteQuantizationMethod.Default
@@ -60,6 +76,14 @@ namespace CodeArt.DotnetGD
             
         }
 
+        /// <summary>
+        /// creates a new image based on the image with a new format.
+        /// </summary>
+        /// <param name="newPixelFormat">The new image format. If the image format is the same, the method is the same as <see cref="Clone"/>.</param>
+        /// <param name="quantizationMethod">Quantization method to use when converting from truecolor to 8-bit. This is ignored when converting to true color.</param>
+        /// <param name="quantizationSpeed">Quantization speed to use when converting from truecolor to 8-bit. This is ignored when converting to true color.</param>
+        /// <param name="dither">Dither flag to use when converting from truecolor to 8-bit. This is ignored when converting to true color.</param>
+        /// <param name="numberOfColorsWanted">Number of target colors to use when converting from truecolor to 8-bit. This is ignored when converting to true color.</param>
         public Image Copy(PixelFormat newPixelFormat, PaletteQuantizationMethod quantizationMethod = PaletteQuantizationMethod.Default, 
             int quantizationSpeed = PaletteQuantizationSpeedBestQuality,
             //int minQuantizationQuality = PaletteQuantizationUgly, int maxQuantizationQuality = PaletteQuantizationPerfect,
@@ -83,6 +107,21 @@ namespace CodeArt.DotnetGD
             
         }
 
-        
+        //public void ColorMatch(Image other)
+        //{
+        //    if (other == null)
+        //        throw new ArgumentNullException(nameof(other));
+        //    CheckObjectDisposed();
+        //    other.CheckObjectDisposed();
+        //    if (other.PixelFormat != PixelFormat.Format8BppIndexed)
+        //        throw new ArgumentException($"Other image must have {PixelFormat.Format8BppIndexed} pixel format.", nameof(other));
+        //    if (PixelFormat != PixelFormat.Format8BppIndexed)
+        //        throw new InvalidOperationException($"Image must have {PixelFormat.Format8BppIndexed} pixel format.");
+        //    if (Size != other.Size)
+        //        throw new ArgumentException("Other image has different size.", nameof(other));
+        //    NativeWrappers.gdImageColorMatch(other.ImagePtr, ImagePtr);
+        //}
+
+
     }
 }

@@ -9,29 +9,40 @@ namespace CodeArt.DotnetGD
 {
     public unsafe partial class Image
     {
-        public Color GetPixel(int x, int y)
+        /// <summary>
+        /// Gets the color or a pixel at given point
+        /// </summary>
+        /// <param name="p">Point to get pixel at</param>
+        /// <returns>color of the pixel</returns>
+        public Color GetPixel(Point p)
         {
-            if (x < 0 || x >= Width)
-                throw new ArgumentOutOfRangeException(nameof(x), x, "Value outside image bounds.");
-            if (y < 0 || y >= Height)
-                throw new ArgumentOutOfRangeException(nameof(y), y, "Value outside image bounds.");
             CheckObjectDisposed();
-            var color = NativeWrappers.gdImageGetTrueColorPixel(ImagePtr, x, y);
+            if (!Bounds.Contains(p)) throw new ArgumentException("Point is outside image bounds.", nameof(p));
+            var color = NativeWrappers.gdImageGetTrueColorPixel(ImagePtr, p.X, p.Y);
             return GdTrueColorToColor(color);
         }
 
-        public void SetPixel(int x, int y, Color color)
+        /// <summary>
+        /// Sets the color of pixel at a given point
+        /// </summary>
+        /// <param name="p">Point to set color at</param>
+        /// <param name="color">color</param>
+        public void SetPixel(Point p, Color color)
         {
-            if (x < 0 || x >= Width)
-                throw new ArgumentOutOfRangeException(nameof(x), x, "Value outside image bounds.");
-            if (y < 0 || y >= Height)
-                throw new ArgumentOutOfRangeException(nameof(y), y, "Value outside image bounds.");
             CheckObjectDisposed();
+            if (!Bounds.Contains(p)) throw new ArgumentException("Point is outside image bounds.", nameof(p));
             var colorIndex = ResolveColor(color);
-            NativeWrappers.gdImageSetPixel(ImagePtr, x, y, colorIndex);
+            NativeWrappers.gdImageSetPixel(ImagePtr, p.X, p.Y, colorIndex);
         }
 
         #region DrawLine overloads
+
+        /// <summary>
+        /// Draws a straight line between 2 points
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <param name="color"></param>
         public void DrawLine(Point p1, Point p2, Color color)
         {
             CheckObjectDisposed();
@@ -39,12 +50,25 @@ namespace CodeArt.DotnetGD
             NativeWrappers.gdImageLine(ImagePtr, p1.X, p1.Y, p2.X, p2.Y, resolvedColor);
         }
 
+        /// <summary>
+        /// Draws a straight line between 2 points using a pen
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <param name="pen"></param>
         public void DrawLine(Point p1, Point p2, Pen pen)
         {
             CheckObjectDisposed();
             SetPen(pen);
             NativeWrappers.gdImageLine(ImagePtr, p1.X, p1.Y, p2.X, p2.Y, GdStyled);
         }
+
+        /// <summary>
+        /// Draws a straight line between 2 points using a brush
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <param name="brush"></param>
         public void DrawLine(Point p1, Point p2, Image brush)
         {
             CheckObjectDisposed();
@@ -54,6 +78,12 @@ namespace CodeArt.DotnetGD
         #endregion
 
         #region DrawRecangle overloads
+
+        /// <summary>
+        /// Draws a straight rectangle between 2 points
+        /// </summary>
+        /// <param name="rectangle"></param>
+        /// <param name="color"></param>
         public void DrawRectangle(Rectangle rectangle, Color color)
         {
             CheckObjectDisposed();
@@ -61,6 +91,11 @@ namespace CodeArt.DotnetGD
             NativeWrappers.gdImageRectangle(ImagePtr, rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom, resolvedColor);
         }
 
+        /// <summary>
+        /// Draws a straight rectangle using a pen
+        /// </summary>
+        /// <param name="rectangle"></param>
+        /// <param name="pen"></param>
         public void DrawRectangle(Rectangle rectangle, Pen pen)
         {
             CheckObjectDisposed();
@@ -68,6 +103,11 @@ namespace CodeArt.DotnetGD
             NativeWrappers.gdImageRectangle(ImagePtr, rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom, GdStyled);
         }
 
+        /// <summary>
+        /// Draws a rectangle using a brush
+        /// </summary>
+        /// <param name="rectangle"></param>
+        /// <param name="brush"></param>
         public void DrawRectangle(Rectangle rectangle, Image brush)
         {
             CheckObjectDisposed();
@@ -77,6 +117,12 @@ namespace CodeArt.DotnetGD
         #endregion
 
         #region DrawFilledRectangle overloads
+
+        /// <summary>
+        /// Draws a filled rectangle using solid color
+        /// </summary>
+        /// <param name="rectangle"></param>
+        /// <param name="color"></param>
         public void DrawFilledRectangle(Rectangle rectangle, Color color)
         {
             CheckObjectDisposed();
@@ -84,6 +130,11 @@ namespace CodeArt.DotnetGD
             NativeWrappers.gdImageFilledRectangle(ImagePtr, rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom, resolvedColor);
         }
 
+        /// <summary>
+        /// Draws a filled rectangle using a tile
+        /// </summary>
+        /// <param name="rectangle"></param>
+        /// <param name="tile"></param>
         public void DrawFilledRectangle(Rectangle rectangle, Image tile)
         {
             CheckObjectDisposed();
@@ -93,6 +144,13 @@ namespace CodeArt.DotnetGD
         #endregion DrawFilledRectangle overloads
 
         #region DrawEllipse overloads
+
+        /// <summary>
+        /// Draws an ellipse
+        /// </summary>
+        /// <param name="center">center of the ellipse</param>
+        /// <param name="size">width and height of the ellipse (i.e. radii * 2)</param>
+        /// <param name="color">color</param>
         public void DrawEllipse(Point center, Size size, Color color)
         {
             CheckObjectDisposed();
@@ -108,6 +166,12 @@ namespace CodeArt.DotnetGD
         //    NativeWrappers.gdImageEllipse(ImagePtr, center.X, center.Y, size.Width, size.Height, GdStyled);
         //}
 
+        /// <summary>
+        /// Draws an ellipse using a brush
+        /// </summary>
+        /// <param name="center">center of the ellipse</param>
+        /// <param name="size">width and height of the ellipse (i.e. radii * 2)</param>
+        /// <param name="brush">color</param>
         public void DrawEllipse(Point center, Size size, Image brush)
         {
             CheckObjectDisposed();
@@ -117,6 +181,13 @@ namespace CodeArt.DotnetGD
         #endregion
 
         #region DrawFilledEllipse overloads
+
+        /// <summary>
+        /// Draws a filled ellipse with solid color
+        /// </summary>
+        /// <param name="center">center of the ellipse</param>
+        /// <param name="size">width and height of the ellipse (i.e. radii * 2)</param>
+        /// <param name="color">color</param>
         public void DrawFilledEllipse(Point center, Size size, Color color)
         {
             CheckObjectDisposed();
@@ -124,6 +195,12 @@ namespace CodeArt.DotnetGD
             NativeWrappers.gdImageFilledEllipse(ImagePtr, center.X, center.Y, size.Width, size.Height, resolvedColor);
         }
 
+        /// <summary>
+        /// Draws a filled ellipse using a tile
+        /// </summary>
+        /// <param name="center">center of the ellipse</param>
+        /// <param name="size">width and height of the ellipse (i.e. radii * 2)</param>
+        /// <param name="tile"></param>
         public void DrawFilledEllipse(Point center, Size size, Image tile)
         {
             CheckObjectDisposed();
@@ -134,6 +211,11 @@ namespace CodeArt.DotnetGD
 
         #region Polygon methods
 
+        /// <summary>
+        /// Draws a polygon
+        /// </summary>
+        /// <param name="points">array of vertixes</param>
+        /// <param name="color"></param>
         public void DrawPolygon(Point[] points, Color color)
         {
             CheckObjectDisposed();
@@ -143,6 +225,11 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// Draws a polygon using a pen
+        /// </summary>
+        /// <param name="points">array of vertixes</param>
+        /// <param name="pen"></param>
         public void DrawPolygon(Point[] points, Pen pen)
         {
             CheckObjectDisposed();
@@ -153,6 +240,11 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// Draws a polygon using a brush
+        /// </summary>
+        /// <param name="points">array of vertixes</param>
+        /// <param name="brush"></param>
         public void DrawPolygon(Point[] points, Image brush)
         {
             CheckObjectDisposed();
@@ -163,6 +255,11 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// Draws an open polygon 
+        /// </summary>
+        /// <param name="points">array of vertixes</param>
+        /// <param name="color"></param>
         public void DrawOpenPolygon(Point[] points, Color color)
         {
             CheckObjectDisposed();
@@ -172,6 +269,11 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// Draws an open polygon using a brush
+        /// </summary>
+        /// <param name="points">array of vertixes</param>
+        /// <param name="brush"></param>
         public void DrawOpenPolygon(Point[] points, Image brush)
         {
             CheckObjectDisposed();
@@ -182,6 +284,11 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// Draws a filled polygon using solid color
+        /// </summary>
+        /// <param name="points">array of vertixes</param>
+        /// <param name="color"></param>
         public void DrawFilledPolygon(Point[] points, Color color)
         {
             CheckObjectDisposed();
@@ -191,6 +298,11 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// Draws a filled polygon using a tile color
+        /// </summary>
+        /// <param name="points">array of vertixes</param>
+        /// <param name="tile"></param>
         public void DrawFilledPolygon(Point[] points, Image tile)
         {
             CheckObjectDisposed();
@@ -202,6 +314,23 @@ namespace CodeArt.DotnetGD
         }
         #endregion
 
+        /// <summary>
+        /// Draws a text
+        /// </summary>
+        /// <param name="text">text to right</param>
+        /// <param name="point">The top left corner of the rectangle to write text to</param>
+        /// <param name="fontName">Name of the font.
+        /// Name of the font can either be a full path of a font file, or a relative path relative too ApplicationBasePath.
+        /// If the font name has no extension, .ttf extension is assumed.
+        /// If the file doesn't exist a <see cref="FileNotFoundException"/> is thrown.
+        /// Libgd can open system fonts, but until I figure out a way to prevent libgd from crashing when an invalid font name is passed, I will limit it to font files.
+        /// </param>
+        /// <param name="fontSize">Font size</param>
+        /// <param name="angle">angle in degrees</param>
+        /// <param name="color">color of the string</param>
+        /// <param name="flags">Processing flags for right to left languages such as arabic. 
+        /// Default flag does no processing which will cause text in such languages to be rendered incorrectly unless parameter passed to text was already processed before calling DrawString.
+        /// </param>
         public void DrawString(string text, Point point, string fontName, double fontSize, double angle, Color color, DrawStringFlags flags = DrawStringFlags.Default)
         {
             CheckObjectDisposed();
@@ -210,8 +339,15 @@ namespace CodeArt.DotnetGD
             NativeWrappers.gdImageStringFT(ImagePtr, null, ResolveColor(color), GetFont(fontName), fontSize, angle, point.X, point.Y, utf8);
         }
 
+        /// <summary>
+        /// Gets a font by font name
+        /// </summary>
+        /// <param name="fontName"></param>
+        /// <returns></returns>
         private static string GetFont(string fontName)
         {
+            // TODO: Handle the case of loading system fonts without libgd crashing when an invalid font name is passed.
+
             if (string.IsNullOrWhiteSpace(fontName))
                 throw new ArgumentNullException(nameof(fontName));
             if (!Path.IsPathRooted(fontName))
@@ -228,6 +364,12 @@ namespace CodeArt.DotnetGD
             return fontName;
         }
 
+        /// <summary>
+        /// Format string
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="flags"></param>
+        /// <returns></returns>
         private static string FormatString(string text, DrawStringFlags flags)
         {
             if ((flags & DrawStringFlags.ArabicShaping) != 0)
@@ -256,6 +398,11 @@ namespace CodeArt.DotnetGD
             return text;
         }
 
+        /// <summary>
+        /// Converts a 31 bit signed int libgd color to 32bit color.
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
         private static Color GdTrueColorToColor(int color)
         {
             var alpha = unchecked(((uint)color & 0xff000000) >> 24);
@@ -263,6 +410,11 @@ namespace CodeArt.DotnetGD
             return new Color(unchecked(((uint)color & 0x00ffffff)) | (alpha << 24));
         }
 
+        /// <summary>
+        /// Converts 32 bit color to libgd 31 bit signed int color (note that there is a little loss in alpha resolution)
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
         private int ResolveColor(Color color)
         {
             SetPen(null);
