@@ -1,7 +1,9 @@
-﻿using System;
+﻿// Copyright (c) Sherif Elmetainy (Code Art). 
+// Licensed under the MIT License, See License.txt in the repository root for license information.
+
+using System;
 using System.Collections.Generic;
 using System.Reflection;
-using CodeArt.DotnetGD;
 using Xunit.Sdk;
 
 namespace CodeArt.DotnetGD.Tests

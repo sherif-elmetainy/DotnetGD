@@ -1,4 +1,7 @@
-﻿/*
+﻿// Copyright (c) Sherif Elmetainy (Code Art). 
+// Licensed under the MIT License, See License.txt in the repository root for license information.
+
+/*
 * Bidi reference implementation from http://www.unicode.org/Public/PROGRAMS/BidiReferenceJava/
 * Original Code ported from java to C# by Sherif Elmetainy
 * The credits and copyright info for the original code listed below
@@ -22,17 +25,17 @@
 */
 
 
- /*
-  * Revision info (2013-09-16)
-  * Changed MAX_DEPTH to 125
-  * 
-  * Revision info (2013-06-02):
-  * <p>
-  * The core part of the Unicode Paired Bracket Algorithm (PBA) 
-  * is implemented in a new BidiPBAReference class.
-  * <p>
-  * Changed convention for default paragraph embedding level from -1 to 2.
-  */
+/*
+ * Revision info (2013-09-16)
+ * Changed MAX_DEPTH to 125
+ * 
+ * Revision info (2013-06-02):
+ * <p>
+ * The core part of the Unicode Paired Bracket Algorithm (PBA) 
+ * is implemented in a new BidiPBAReference class.
+ * <p>
+ * Changed convention for default paragraph embedding level from -1 to 2.
+ */
 using System;
 using System.Linq;
 using static CodeArt.Bidi.BidiDirection;

@@ -1,4 +1,7 @@
-﻿namespace CodeArt.Bidi
+﻿// Copyright (c) Sherif Elmetainy (Code Art). 
+// Licensed under the MIT License, See License.txt in the repository root for license information.
+
+namespace CodeArt.Bidi
 {
     /// <summary>
     /// Bidi direction

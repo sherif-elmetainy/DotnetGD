@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Sherif Elmetainy (Code Art). 
+// Licensed under the MIT License, See License.txt in the repository root for license information.
+
+using System;
 using CodeArt.DotnetGD.Libgd;
 
 namespace CodeArt.DotnetGD
@@ -199,11 +202,6 @@ namespace CodeArt.DotnetGD
         public Matrix Translate(double offsetX, double offsetY, MatrixOrder matrixOrder = MatrixOrder.Prepend)
         {
             return Apply(CreateTranslate(offsetX, offsetY), matrixOrder);
-        }
-
-        public Matrix Flip(bool flipHorizontal, bool flipVertical, MatrixOrder matrixOrder = MatrixOrder.Prepend)
-        {
-            return Apply(Flip(flipHorizontal, flipVertical), matrixOrder);
         }
 
         private Matrix Apply(Matrix other, MatrixOrder matrixOrder)

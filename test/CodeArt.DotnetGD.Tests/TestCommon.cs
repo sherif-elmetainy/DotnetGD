@@ -1,4 +1,7 @@
-﻿using System.Diagnostics;
+﻿// Copyright (c) Sherif Elmetainy (Code Art). 
+// Licensed under the MIT License, See License.txt in the repository root for license information.
+
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using CodeArt.DotnetGD.Formatters;

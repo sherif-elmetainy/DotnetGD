@@ -1,4 +1,7 @@
-﻿/*
+﻿// Copyright (c) Sherif Elmetainy (Code Art). 
+// Licensed under the MIT License, See License.txt in the repository root for license information.
+
+/*
 * Arabic sharping implementation ported from the ICU Project
 * http://site.icu-project.org/
 * Original code license: http://site.icu-project.org/

@@ -1,12 +1,13 @@
-﻿using System.Globalization;
+﻿// Copyright (c) Sherif Elmetainy (Code Art). 
+// Licensed under the MIT License, See License.txt in the repository root for license information.
+
+using System.Globalization;
 using Xunit;
 using System.Text;
 using System.Linq;
 
 namespace CodeArt.Bidi.Tests
 {
-    // This project can output the Class library as a NuGet Package.
-    // To enable this option, right-click on the project and select the Properties menu item. In the Build tab select "Produce outputs on build".
     public class BidiTests
     {
         [Theory]

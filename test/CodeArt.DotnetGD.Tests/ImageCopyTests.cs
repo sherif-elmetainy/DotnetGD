@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿// Copyright (c) Sherif Elmetainy (Code Art). 
+// Licensed under the MIT License, See License.txt in the repository root for license information.
+
+using System.IO;
 using Xunit;
 
 namespace CodeArt.DotnetGD.Tests

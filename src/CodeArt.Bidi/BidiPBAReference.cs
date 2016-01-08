@@ -1,4 +1,7 @@
-﻿/*
+﻿// Copyright (c) Sherif Elmetainy (Code Art). 
+// Licensed under the MIT License, See License.txt in the repository root for license information.
+
+/*
 * Bidi reference implementation from http://www.unicode.org/Public/PROGRAMS/BidiReferenceJava/
 * Original Code ported from java to C# by Sherif Elmetainy
 * The credits and copyright info for the original code listed below

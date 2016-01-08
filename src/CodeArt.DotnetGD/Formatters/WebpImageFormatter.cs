@@ -1,4 +1,7 @@
-﻿#if WEBP
+﻿// Copyright (c) Sherif Elmetainy (Code Art). 
+// Licensed under the MIT License, See License.txt in the repository root for license information.
+
+#if WEBP
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

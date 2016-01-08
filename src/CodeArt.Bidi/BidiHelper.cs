@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿// Copyright (c) Sherif Elmetainy (Code Art). 
+// Licensed under the MIT License, See License.txt in the repository root for license information.
+
+using System.Linq;
 using System.Text;
 
 namespace CodeArt.Bidi

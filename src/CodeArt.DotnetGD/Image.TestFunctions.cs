@@ -1,4 +1,7 @@
-﻿using CodeArt.DotnetGD.Libgd;
+﻿// Copyright (c) Sherif Elmetainy (Code Art). 
+// Licensed under the MIT License, See License.txt in the repository root for license information.
+
+using CodeArt.DotnetGD.Libgd;
 
 namespace CodeArt.DotnetGD
 {

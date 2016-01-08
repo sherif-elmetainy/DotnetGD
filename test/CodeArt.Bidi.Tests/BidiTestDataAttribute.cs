@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
+﻿// Copyright (c) Sherif Elmetainy (Code Art). 
+// Licensed under the MIT License, See License.txt in the repository root for license information.
+
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using Xunit.Sdk;
 
