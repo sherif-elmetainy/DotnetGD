@@ -20,7 +20,7 @@ namespace CodeArt.DotnetGD.Libgd
         // However, a closer look at the source code of libgd showed that a this is called before freeing unmanaged memory used by libgd
         // So having the managed error handle throw an exception would cause unmanaged memory leaks that the GC can't collect.
         // I also cannot read the error from stderr because it's the same for all threads
-        
+
         // As a REALLY UGLY workaround, I have the managed handler write the error message to a thread static variable.
 
         private const int Notice = 5;
@@ -56,7 +56,7 @@ namespace CodeArt.DotnetGD.Libgd
         public static void InitializeLibGd()
         {
             NativeMethods.gdSetErrorMethod(Marshal.GetFunctionPointerForDelegate<LibgdErrorCallbackDelegate>(LibgdErrorCallback));
-            
+
             // Calling this during initialization because of the following (comment copied from gd.h)
             /* 2.0.16: for thread-safe use of gdImageStringFT and friends,
             call this before allowing any thread to call gdImageStringFT.
@@ -208,7 +208,7 @@ namespace CodeArt.DotnetGD.Libgd
             CheckForLibgdError();
         }
 
-        public static void gdImageSetBrush(GdImage* im, GdImage *brush)
+        public static void gdImageSetBrush(GdImage* im, GdImage* brush)
         {
             ResetError();
             NativeMethods.gdImageSetBrush(im, brush);
@@ -646,6 +646,447 @@ namespace CodeArt.DotnetGD.Libgd
             ResetError();
             NativeMethods.gdImageTrueColorToPaletteSetQuality(im, minQuality, maxQuality);
             CheckForLibgdError();
+        }
+
+        // color replace
+        public static int gdImageColorReplace(GdImage* im, int src, int dst)
+        {
+            ResetError();
+            var n = NativeMethods.gdImageColorReplace(im, src, dst);
+            CheckForLibgdError();
+            return n;
+        }
+
+        public static int gdImageColorReplaceThreshold(GdImage* im, int src, int dst, float threshold)
+        {
+            ResetError();
+            var n = NativeMethods.gdImageColorReplaceThreshold(im, src, dst, threshold);
+            CheckForLibgdError();
+            return n;
+        }
+
+        public static int gdImageColorReplaceArray(GdImage* im, int len, int* src, int* dst)
+        {
+            ResetError();
+            var n = NativeMethods.gdImageColorReplaceArray(im, len, src, dst);
+            CheckForLibgdError();
+            return n;
+        }
+
+        public static int gdImagePixelate(GdImage* im, int blockSize, uint mode)
+        {
+            ResetError();
+            var res = NativeMethods.gdImagePixelate(im, blockSize, mode);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdImageScatter(GdImage* im, int sub, int plus)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageScatter(im, sub, plus);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdImageScatterColor(GdImage* im, int sub, int plus, int* colors, uint numColors)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageScatterColor(im, sub, plus, colors, numColors);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdImageScatterEx(GdImage* im, GdScatter* s)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageScatterEx(im, s);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdImageSmooth(GdImage* im, float weight)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageSmooth(im, weight);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdImageMeanRemoval(GdImage* im)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageMeanRemoval(im);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdImageEmboss(GdImage* im)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageEmboss(im);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdImageGaussianBlur(GdImage* im)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageGaussianBlur(im);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdImageEdgeDetectQuick(GdImage* src)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageEdgeDetectQuick(src);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdImageSelectiveBlur(GdImage* src)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageSelectiveBlur(src);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdImageConvolution(GdImage* src, float* filter, float filterDiv, float offset)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageConvolution(src, filter, filterDiv, offset);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdImageContrast(GdImage* src, double contrast)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageContrast(src, contrast);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdImageBrightness(GdImage* src, int brightness)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageContrast(src, brightness);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdImageGrayScale(GdImage* src)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageGrayScale(src);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static GdImage* gdImageCopyGaussianBlurred(GdImage* src, int radius, double sigma)
+        {
+            ResetError();
+            var img = NativeMethods.gdImageCopyGaussianBlurred(src, radius, sigma);
+            CheckImageResult(img);
+            return img;
+        }
+
+        public static int gdImageNegate(GdImage* src)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageNegate(src);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static void gdImageFlipHorizontal(GdImage* im)
+        {
+            ResetError();
+            NativeMethods.gdImageFlipHorizontal(im);
+            CheckForLibgdError();
+        }
+
+        public static void gdImageFlipVertical(GdImage* im)
+        {
+            ResetError();
+            NativeMethods.gdImageFlipVertical(im);
+            CheckForLibgdError();
+        }
+
+        public static void gdImageFlipBoth(GdImage* im)
+        {
+            ResetError();
+            NativeMethods.gdImageFlipBoth(im);
+            CheckForLibgdError();
+        }
+
+
+        public static GdImage* gdImageCrop(GdImage* src, Rectangle* crop)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageCrop(src, crop);
+            CheckImageResult(res);
+            return res;
+        }
+
+        public static GdImage* gdImageCropAuto(GdImage* im, CropMode mode)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageCropAuto(im, mode);
+            CheckImageResult(res);
+            return res;
+        }
+
+        public static GdImage* gdImageCropThreshold(GdImage* im, int color, float threshold)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageCropThreshold(im, color, threshold);
+            CheckImageResult(res);
+            return res;
+        }
+
+
+        public static int gdImageSetInterpolationMethod(GdImage* im, InterpolationMethod id)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageSetInterpolationMethod(im, id);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static InterpolationMethod gdImageGetInterpolationMethod(GdImage* im)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageGetInterpolationMethod(im);
+            CheckForLibgdError();
+            return res;
+        }
+
+        public static GdImage* gdImageScale(GdImage* src, uint newWidth, uint newHeight)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageScale(src, newWidth, newHeight);
+            CheckImageResult(res);
+            return res;
+        }
+
+        public static GdImage* gdImageRotateInterpolated(GdImage* src, float angle, int bgcolor)
+        {
+            ResetError();
+            var res = NativeMethods.gdImageRotateInterpolated(src, angle, bgcolor);
+            CheckImageResult(res);
+            return res;
+        }
+
+        public static int gdAffineApplyToPointF(PointF* dst, PointF* src, double* affine)
+        {
+            ResetError();
+            var res = NativeMethods.gdAffineApplyToPointF(dst, src, affine);
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdAffineInvert(double* dst, double* src)
+        {
+            ResetError();
+            var res = NativeMethods.gdAffineInvert(dst, src);
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdAffineFlip(double* dst_affine, double* src_affine, int flip_h, int flip_v)
+        {
+            ResetError();
+            var res = NativeMethods.gdAffineFlip(dst_affine, src_affine, flip_h, flip_v);
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdAffineConcat(double* dst, double* m1, double* m2)
+        {
+            ResetError();
+            var res = NativeMethods.gdAffineConcat(dst, m1, m2);
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdAffineIdentity(double* dst)
+        {
+            ResetError();
+            var res = NativeMethods.gdAffineIdentity(dst);
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdAffineScale(double* dst, double scaleX, double scaleY)
+        {
+            ResetError();
+            var res = NativeMethods.gdAffineScale(dst, scaleX, scaleY);
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdAffineRotate(double* dst, double angle)
+        {
+            ResetError();
+            var res = NativeMethods.gdAffineRotate(dst, angle);
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdAffineShearHorizontal(double* dst, double angle)
+        {
+            ResetError();
+            var res = NativeMethods.gdAffineShearHorizontal(dst, angle);
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdAffineShearVertical(double* dst, double angle)
+        {
+            ResetError();
+            var res = NativeMethods.gdAffineShearVertical(dst, angle);
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdAffineTranslate(double* dst, double offsetX, double offsetY)
+        {
+            ResetError();
+            var res = NativeMethods.gdAffineTranslate(dst, offsetX, offsetY);
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static double gdAffineExpansion(double* src)
+        {
+            ResetError();
+            var res = NativeMethods.gdAffineExpansion(src);
+            CheckForLibgdError();
+            return res;
+        }
+
+        public static int gdAffineRectilinear(double* src)
+        {
+            ResetError();
+            var res = NativeMethods.gdAffineRectilinear(src);
+            CheckForLibgdError();
+            return res;
+        }
+
+        public static int gdAffineEqual(double* matrix1, double* matrix2)
+        {
+            ResetError();
+            var res = NativeMethods.gdAffineEqual(matrix1, matrix2);
+            CheckForLibgdError();
+            return res;
+        }
+
+        public static int gdTransformAffineGetImage(out GdImage* dst, GdImage* src, Rectangle* srcArea, double* affine)
+        {
+            ResetError();
+            var res = NativeMethods.gdTransformAffineGetImage(out dst, src, srcArea, affine);
+            CheckImageResult(dst);
+            if (res == 0)
+            {
+                NativeMethods.gdImageDestroy(dst);
+                ThrowException("Method returned FALSE.");
+            }
+            return res;
+        }
+
+        public static int gdTransformAffineCopy(GdImage* dst, int dstX, int dstY, GdImage* src, Rectangle* srcRegion, double* affine)
+        {
+            ResetError();
+            var res = NativeMethods.gdTransformAffineCopy(dst, dstX, dstY, src, srcRegion, affine);
+            CheckForLibgdError();
+            if (res == 0)
+                ThrowException("Method returned FALSE.");
+            return res;
+        }
+
+        public static int gdMajorVersion()
+        {
+            ResetError();
+            var res = NativeMethods.gdMajorVersion();
+            CheckForLibgdError();
+            return res;
+        }
+
+        public static int gdMinorVersion()
+        {
+            ResetError();
+            var res = NativeMethods.gdMinorVersion();
+            CheckForLibgdError();
+            return res;
+        }
+
+        public static int gdReleaseVersion()
+        {
+            ResetError();
+            var res = NativeMethods.gdReleaseVersion();
+            CheckForLibgdError();
+            return res;
+        }
+
+        public static string gdExtraVersion()
+        {
+            ResetError();
+            var res = NativeMethods.gdExtraVersion();
+            CheckForLibgdError();
+            return res;
+        }
+
+        public static string gdVersionString()
+        {
+            ResetError();
+            var res = NativeMethods.gdVersionString();
+            CheckForLibgdError();
+            return res;
         }
         // ReSharper restore InconsistentNaming
     }

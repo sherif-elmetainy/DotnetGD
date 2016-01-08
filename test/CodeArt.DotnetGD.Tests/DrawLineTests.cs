@@ -19,6 +19,38 @@ namespace CodeArt.DotnetGD.Tests
 
         [Theory]
         [PixelFormatsData]
+        public void DrawThickLine(PixelFormat format)
+        {
+            using (var image = TestCommon.CreateImageWhiteBackground(format))
+            {
+
+                var pen = new Pen(20, Color.Blue);
+
+                image.DrawLine(new Point(0, 3), new Point(image.Width - 1, image.Height - 3), pen);
+                image.CompareToReferenceImage(format.ToString());
+            }
+        }
+
+        /// <summary>
+        /// AntiAlias works for True color only
+        /// </summary>
+        /// <param name="format"></param>
+        [Theory]
+        [InlineData(PixelFormat.Format32BppArgb)]
+        public void DrawAntiAliasedLine(PixelFormat format)
+        {
+            using (var image = TestCommon.CreateImageWhiteBackground(format))
+            {
+
+                var pen = new Pen(Color.Blue, true);
+
+                image.DrawLine(new Point(0, 3), new Point(image.Width - 1, image.Height - 3), pen);
+                image.CompareToReferenceImage(format.ToString());
+            }
+        }
+
+        [Theory]
+        [PixelFormatsData]
         public void DrawDashedLine(PixelFormat format)
         {
             using (var image = TestCommon.CreateImageWhiteBackground(format))

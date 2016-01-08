@@ -15,6 +15,25 @@ namespace CodeArt.DotnetGD
         private const int GdBrushed = -3;
         //private const int GdStyledBrushed = -4;
         private const int GdTiled = -5;
+        private const int GdAntiAlias = -7;
+
+        /// <summary>
+        /// Gets or sets the drawing effect used for drawing functions
+        /// </summary>
+        public DrawingEffect DrawingEffect
+        {
+            get
+            {
+                CheckObjectDisposed();
+                return ImagePtr->AlphaBlendingFlag;
+            }
+            set
+            {
+                if (value < DrawingEffect.Replace && value >= DrawingEffect.Invalid)
+                    throw new ArgumentOutOfRangeException(nameof(value), value, "Invalid Drawing effect.");
+                ImagePtr->AlphaBlendingFlag = value;
+            }
+        }
 
         private void SetBrush(Image brush)
         {
@@ -54,18 +73,33 @@ namespace CodeArt.DotnetGD
 
         private void SetPen(Pen value)
         {
-            if (ReferenceEquals(_pen, value))
+            if (Pen.Equals(_pen, value))
                 return;
             if (value == null)
             {
                 ImagePtr->Thick = 1;
                 ClearOldLineStyle();
+                ImagePtr->AA = 0;
+                ImagePtr->AADontBlend = -1;
+                ImagePtr->AAColor = 0;
             }
             else
             {
                 ImagePtr->Thick = value.Thickness;
-                if (value.DashColors == null || value.DashColors.Count == 0)
+                if (value.DashColors.Length == 1)
+                {
+                    if (value.AntiAlias)
+                    {
+                        ImagePtr->AA = 1;
+                        ImagePtr->AAColor = ResolveColor(value.Color);
+                        ImagePtr->AADontBlend = -1;
+                    }
+                    else
+                    {
+                        ImagePtr->AA = 0;
+                    }
                     ClearOldLineStyle();
+                }
                 else
                 {
                     var colors = value.DashColors.Select(ResolveColor).ToArray();
@@ -73,6 +107,8 @@ namespace CodeArt.DotnetGD
                     try
                     {
                         Marshal.Copy(colors, 0, ptr, colors.Length);
+                        // when calling gdImageSetStyle old style is freed by libgd
+                        // No need to call ClearOldLineStyle()
                         NativeWrappers.gdImageSetStyle(ImagePtr, ptr, colors.Length);
                     }
                     finally
@@ -86,6 +122,7 @@ namespace CodeArt.DotnetGD
 
         private void ClearOldLineStyle()
         {
+            // when calling gdImageSetStyle old style is freed by libgd
             if (ImagePtr->Style == null) return;
             NativeWrappers.gdFree((IntPtr)ImagePtr->Style);
             ImagePtr->Style = null;

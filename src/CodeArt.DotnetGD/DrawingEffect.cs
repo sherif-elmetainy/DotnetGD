@@ -1,6 +1,6 @@
 ﻿namespace CodeArt.DotnetGD
 {
-    public enum AlphaBlendingEffect
+    public enum DrawingEffect
     {
         Replace = 0,
         AlphaBlend = 1,

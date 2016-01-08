@@ -293,7 +293,7 @@ namespace CodeArt.DotnetGD.Libgd
            even if semitransparent palette entries exist.
            To do that, build your image as a truecolor image,
            then quantize down to 8 bits. */
-        public AlphaBlendingEffect AlphaBlendingFlag;
+        public DrawingEffect AlphaBlendingFlag;
         /* Should the alpha channel of the image be saved? This affects
            PNG at the moment; other future formats may also
            have that capability. JPEG doesn't. */

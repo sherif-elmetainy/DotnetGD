@@ -46,7 +46,7 @@ namespace CodeArt.DotnetGD.Libgd
         public static extern void gdImageSetStyle(GdImage* im, IntPtr style, int noOfPixels);
         // Drawing functions
         [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
-        public static extern void gdImageSetBrush(GdImage* im, GdImage *brush);
+        public static extern void gdImageSetBrush(GdImage* im, GdImage* brush);
         [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
         public static extern void gdImageSetTile(GdImage* im, GdImage* tile);
 
@@ -75,7 +75,7 @@ namespace CodeArt.DotnetGD.Libgd
 
         [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
         [return: MarshalAs(UnmanagedType.LPStr)]
-        public static extern string gdImageStringFT(GdImage* im, int* brect, int fg, 
+        public static extern string gdImageStringFT(GdImage* im, int* brect, int fg,
                 [MarshalAs(UnmanagedType.LPStr)]
                 string fontList, double ptSize, double angle, int x, int y,
                 byte[] utf8String
@@ -200,6 +200,159 @@ namespace CodeArt.DotnetGD.Libgd
 
         [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
         public static extern void gdImageTrueColorToPaletteSetQuality(GdImage* im, int minQuality, int maxQuality);
+
+        // color replace
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageColorReplace(GdImage* im, int src, int dst);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageColorReplaceThreshold(GdImage* im, int src, int dst, float threshold);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageColorReplaceArray(GdImage* im, int len, int* src, int* dst);
+
+
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImagePixelate(GdImage* im, int blockSize, uint mode);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageScatter(GdImage* im, int sub, int plus);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageScatterColor(GdImage* im, int sub, int plus, int* colors, uint numColors);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageScatterEx(GdImage* im, GdScatter* s);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageSmooth(GdImage* im, float weight);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageMeanRemoval(GdImage* im);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageEmboss(GdImage* im);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageGaussianBlur(GdImage* im);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageEdgeDetectQuick(GdImage* src);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageSelectiveBlur(GdImage* src);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageConvolution(GdImage* src, float* filter, float filterDiv, float offset);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageContrast(GdImage* src, double contrast);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageBrightness(GdImage* src, int brightness);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageGrayScale(GdImage* src);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern GdImage* gdImageCopyGaussianBlurred(GdImage* src, int radius, double sigma);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageNegate(GdImage* src);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern void gdImageFlipHorizontal(GdImage* im);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern void gdImageFlipVertical(GdImage* im);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern void gdImageFlipBoth(GdImage* im);
+
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern GdImage* gdImageCrop(GdImage* src, Rectangle* crop);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern GdImage* gdImageCropAuto(GdImage* im, CropMode mode);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern GdImage* gdImageCropThreshold(GdImage* im, int color, float threshold);
+
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdImageSetInterpolationMethod(GdImage* im, InterpolationMethod id);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern InterpolationMethod gdImageGetInterpolationMethod(GdImage* im);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern GdImage* gdImageScale(GdImage* src, uint newWidth, uint newHeight);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern GdImage* gdImageRotateInterpolated(GdImage* src, float angle, int bgcolor);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdAffineApplyToPointF(PointF* dst, PointF* src, double* affine);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdAffineInvert(double* dst, double* src);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdAffineFlip(double* dst, double* src, int flipH, int flipV);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdAffineConcat(double* dst, double* m1, double* m2);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdAffineIdentity(double* dst);
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdAffineScale(double* dst, double scaleX, double scaleY);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdAffineRotate(double* dst, double angle);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdAffineShearHorizontal(double* dst, double angle);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdAffineShearVertical(double* dst, double angle);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdAffineTranslate(double* dst, double offsetX, double offsetY);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern double gdAffineExpansion(double* src);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdAffineRectilinear(double* src);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdAffineEqual(double* matrix1, double* matrix2);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdTransformAffineGetImage(out GdImage* dst, GdImage* src, Rectangle* srcArea, double* affine);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdTransformAffineCopy(GdImage* dst, int dstX, int dstY, GdImage* src, Rectangle* srcRegion, double* affine);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdMajorVersion();
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdMinorVersion();
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern int gdReleaseVersion();
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        [return:MarshalAs(UnmanagedType.LPStr)]
+        public static extern string gdExtraVersion();
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        [return: MarshalAs(UnmanagedType.LPStr)]
+        public static extern string gdVersionString();
     }
 
 

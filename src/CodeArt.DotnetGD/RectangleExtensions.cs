@@ -55,6 +55,57 @@ namespace CodeArt.DotnetGD
             return new Rectangle(x1, y1, x2 - x1, y2 - y1);
         }
 
-        
+        public static bool Contains(this RectangleF rect, PointF p) => rect.Contains(p.X, p.Y);
+
+        public static bool Contains(this RectangleF rect, double x, double y) => x >= rect.X
+                                                                          && x < rect.Right
+                                                                          && y >= rect.Y
+                                                                          && y < rect.Bottom;
+
+        public static bool Contains(this RectangleF rect, RectangleF other) => other.X >= rect.X
+                                                                             && other.Right <= rect.Right
+                                                                             && other.Y >= rect.Y
+                                                                             && other.Bottom <= rect.Bottom;
+
+        public static bool IsContainedIn(this RectangleF rect, RectangleF other) => other.Contains(rect);
+
+        public static RectangleF Inflate(this RectangleF rect, double width, double height) => new RectangleF(rect.X - width, rect.Y - height, rect.Width + 2 * width, rect.Height + 2 * height);
+
+        public static RectangleF Inflate(this RectangleF rect, SizeF size) => rect.Inflate(size.Width, size.Height);
+
+        public static RectangleF Deflate(this RectangleF rect, double width, double height) => rect.Inflate(-width, -height);
+
+        public static RectangleF Deflate(this RectangleF rect, SizeF size) => rect.Inflate(-size.Width, -size.Height);
+
+        public static RectangleF Intersect(this RectangleF rect, RectangleF other)
+        {
+            var x1 = Math.Min(rect.X, other.X);
+            var x2 = Math.Min(rect.Right, other.Right);
+            var y1 = Math.Min(rect.Y, other.Y);
+            var y2 = Math.Min(rect.Bottom, other.Bottom);
+            if (x1 <= x2 && y1 <= y2)
+                return new RectangleF(x1, y1, x2 - x1, y2 - y1);
+            return new RectangleF();
+        }
+
+        public static bool IntersectsWith(this RectangleF rect, RectangleF other) => rect.X < other.Right
+                                                                                   && other.X < rect.Right
+                                                                                   && rect.Y < other.Bottom
+                                                                                   && other.Y < rect.Bottom;
+
+        public static RectangleF Offset(this RectangleF rect, PointF point) => rect.Offset(point.X, point.Y);
+
+        public static RectangleF Offset(this RectangleF rect, double x, double y) => new RectangleF(rect.X + x, rect.Y + y, rect.Width, rect.Height);
+
+        public static RectangleF Union(this RectangleF rect, RectangleF other)
+        {
+            var x1 = Math.Min(rect.X, other.X);
+            var x2 = Math.Max(rect.Right, other.Right);
+            var y1 = Math.Min(rect.Y, other.Y);
+            var y2 = Math.Max(rect.Bottom, other.Bottom);
+            return new RectangleF(x1, y1, x2 - x1, y2 - y1);
+        }
+
+
     }
 }

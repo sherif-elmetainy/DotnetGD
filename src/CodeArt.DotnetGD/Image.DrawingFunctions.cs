@@ -35,6 +35,65 @@ namespace CodeArt.DotnetGD
             NativeWrappers.gdImageSetPixel(ImagePtr, p.X, p.Y, colorIndex);
         }
 
+        /// <summary>
+        /// Replace all pixels of one color with another
+        /// </summary>
+        /// <param name="oldValue">old color</param>
+        /// <param name="newValue">new color</param>
+        /// <returns>number of pixels replaced</returns>
+        public int ReplacePixels(Color oldValue, Color newValue)
+        {
+            CheckObjectDisposed();
+            var c1 = ResolveColor(oldValue);
+            var c2 = ResolveColor(newValue);
+            return NativeWrappers.gdImageColorReplace(ImagePtr, c1, c2);
+        }
+
+        /// <summary>
+        /// Replace all pixels of one color with another
+        /// </summary>
+        /// <param name="oldValue">old color</param>
+        /// <param name="newValue">new color</param>
+        /// <param name="threshold">threshold representing the maximum distance between searched color and matched color as a percentage. The higher the threshold the more likely the match.</param>
+        /// <returns>number of pixels replaced</returns>
+        public int ReplacePixels(Color oldValue, Color newValue, float threshold)
+        {
+            CheckObjectDisposed();
+            var c1 = ResolveColor(oldValue);
+            var c2 = ResolveColor(newValue);
+            return NativeWrappers.gdImageColorReplaceThreshold(ImagePtr, c1, c2, threshold);
+        }
+
+        /// <summary>
+        /// Replace all pixels of one color with another
+        /// </summary>
+        /// <param name="oldValues">old colors array must be of same length as newValues array</param>
+        /// <param name="newValues">new color array must be of same length as oldValues array</param>
+        /// <returns>number of pixels replaced</returns>
+        public int ReplacePixels(Color[] oldValues, Color[] newValues)
+        {
+            CheckObjectDisposed();
+            if (oldValues == null) throw new ArgumentNullException(nameof(oldValues));
+            if (newValues == null) throw new ArgumentNullException(nameof(newValues));
+            if (oldValues.Length != newValues.Length) throw new ArgumentException($"Array {nameof(oldValues)} length ({oldValues.Length} does not equal array {nameof(newValues)} length ({newValues.Length}).", nameof(newValues));
+            if (oldValues.Length == 0) return 0;
+                
+            var c1 = new int[oldValues.Length];
+            var c2 = new int[newValues.Length];
+            for (var i = 0; i < oldValues.Length; i++)
+            {
+                c1[i] = ResolveColor(oldValues[i]);
+                c2[i] = ResolveColor(newValues[i]);
+            }
+            fixed (int* p1 = c1)
+            {
+                fixed (int* p2 = c2)
+                {
+                    return NativeWrappers.gdImageColorReplaceArray(ImagePtr, c1.Length, p1, p2);
+                }
+            }
+        }
+
         #region DrawLine overloads
 
         /// <summary>
@@ -43,13 +102,8 @@ namespace CodeArt.DotnetGD
         /// <param name="p1"></param>
         /// <param name="p2"></param>
         /// <param name="color"></param>
-        public void DrawLine(Point p1, Point p2, Color color)
-        {
-            CheckObjectDisposed();
-            var resolvedColor = ResolveColor(color);
-            NativeWrappers.gdImageLine(ImagePtr, p1.X, p1.Y, p2.X, p2.Y, resolvedColor);
-        }
-
+        public void DrawLine(Point p1, Point p2, Color color) => DrawLine(p1, p2, new Pen(color));
+        
         /// <summary>
         /// Draws a straight line between 2 points using a pen
         /// </summary>
@@ -60,7 +114,7 @@ namespace CodeArt.DotnetGD
         {
             CheckObjectDisposed();
             SetPen(pen);
-            NativeWrappers.gdImageLine(ImagePtr, p1.X, p1.Y, p2.X, p2.Y, GdStyled);
+            NativeWrappers.gdImageLine(ImagePtr, p1.X, p1.Y, p2.X, p2.Y, GetPenColor(pen));
         }
 
         /// <summary>
@@ -84,13 +138,8 @@ namespace CodeArt.DotnetGD
         /// </summary>
         /// <param name="rectangle"></param>
         /// <param name="color"></param>
-        public void DrawRectangle(Rectangle rectangle, Color color)
-        {
-            CheckObjectDisposed();
-            var resolvedColor = ResolveColor(color);
-            NativeWrappers.gdImageRectangle(ImagePtr, rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom, resolvedColor);
-        }
-
+        public void DrawRectangle(Rectangle rectangle, Color color) => DrawRectangle(rectangle, new Pen(color));
+        
         /// <summary>
         /// Draws a straight rectangle using a pen
         /// </summary>
@@ -100,7 +149,7 @@ namespace CodeArt.DotnetGD
         {
             CheckObjectDisposed();
             SetPen(pen);
-            NativeWrappers.gdImageRectangle(ImagePtr, rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom, GdStyled);
+            NativeWrappers.gdImageRectangle(ImagePtr, rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom, GetPenColor(pen));
         }
 
         /// <summary>
@@ -154,6 +203,7 @@ namespace CodeArt.DotnetGD
         public void DrawEllipse(Point center, Size size, Color color)
         {
             CheckObjectDisposed();
+            SetPen(null);
             var resolvedColor = ResolveColor(color);
             NativeWrappers.gdImageEllipse(ImagePtr, center.X, center.Y, size.Width, size.Height, resolvedColor);
         }
@@ -216,15 +266,8 @@ namespace CodeArt.DotnetGD
         /// </summary>
         /// <param name="points">array of vertixes</param>
         /// <param name="color"></param>
-        public void DrawPolygon(Point[] points, Color color)
-        {
-            CheckObjectDisposed();
-            fixed (Point* ptr = points)
-            {
-                NativeWrappers.gdImagePolygon(ImagePtr, ptr, points.Length, ResolveColor(color));
-            }
-        }
-
+        public void DrawPolygon(Point[] points, Color color) => DrawPolygon(points, new Pen(color));
+        
         /// <summary>
         /// Draws a polygon using a pen
         /// </summary>
@@ -236,7 +279,7 @@ namespace CodeArt.DotnetGD
             SetPen(pen);
             fixed (Point* ptr = points)
             {
-                NativeWrappers.gdImagePolygon(ImagePtr, ptr, points.Length, GdStyled);
+                NativeWrappers.gdImagePolygon(ImagePtr, ptr, points.Length, GetPenColor(pen));
             }
         }
 
@@ -260,12 +303,15 @@ namespace CodeArt.DotnetGD
         /// </summary>
         /// <param name="points">array of vertixes</param>
         /// <param name="color"></param>
-        public void DrawOpenPolygon(Point[] points, Color color)
+        public void DrawOpenPolygon(Point[] points, Color color) => DrawOpenPolygon(points, new Pen(color));
+
+        public void DrawOpenPolygon(Point[] points, Pen pen)
         {
             CheckObjectDisposed();
+            SetPen(pen);
             fixed (Point* ptr = points)
             {
-                NativeWrappers.gdImageOpenPolygon(ImagePtr, ptr, points.Length, ResolveColor(color));
+                NativeWrappers.gdImageOpenPolygon(ImagePtr, ptr, points.Length, GetPenColor(pen));
             }
         }
 
@@ -417,9 +463,25 @@ namespace CodeArt.DotnetGD
         /// <returns></returns>
         private int ResolveColor(Color color)
         {
-            SetPen(null);
             var res = NativeWrappers.gdImageColorResolveAlpha(ImagePtr, color.R, color.G, color.B, (255 - color.A) / 2);
             return res;
+        }
+
+        private int GetPenColor(Pen pen)
+        {
+            if (pen == null)
+            {
+                return 0;
+            }
+            if (pen.AntiAlias)
+            {
+                return GdAntiAlias;
+            }
+            if (pen.DashColors.Length > 1)
+            {
+                return GdStyled;
+            }
+            return ResolveColor(pen.Color);
         }
     }
 }

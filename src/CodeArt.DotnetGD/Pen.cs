@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace CodeArt.DotnetGD
@@ -13,39 +12,54 @@ namespace CodeArt.DotnetGD
         public Pen(int thickness, IEnumerable<Color> dashColors)
         {
             if (dashColors == null) throw new ArgumentNullException(nameof(dashColors));
-            if (thickness < 1)
-                throw new ArgumentOutOfRangeException(nameof(thickness), thickness, "Pen thickness must be positive.");
-            var list = dashColors.ToList();
-            if (list.Count == 0)
+            
+            var ar = dashColors.ToArray();
+            if (ar.Length == 0)
                 throw new ArgumentException("Dash colors collection cannot be empty.", nameof(DashColors));
             Thickness = thickness;
-            DashColors = new ReadOnlyCollection<Color>(list);
+            DashColors = ar;
         }
 
-        public Pen(int thickness) : this(thickness, null)
+        public Pen(int thickness, Color color)
+        {
+            if (thickness < 1)
+                throw new ArgumentOutOfRangeException(nameof(thickness), thickness, "Pen thickness must be positive.");
+            Thickness = thickness;
+            DashColors = new [] { color };
+        }
+
+        public Pen(Color color, bool antiAlias = false) : this(1, color)
+        {
+            AntiAlias = antiAlias;
+        }
+
+        public Pen() : this (Color.Black)
         {
             
         }
 
-        public Pen() : this(1, null)
-        {
-            
-        }
+        public bool AntiAlias { get; }
+
 
         public int Thickness { get; }
 
-        public IReadOnlyCollection<Color> DashColors
+        public Color[] DashColors
         {
             get; 
         }
+
+        public Color Color => DashColors[0];
+        
 
         public bool Equals(Pen other)
         {
             if (other == null)
                 return false;
+            if (ReferenceEquals(this, other)) return true;
+
             return Thickness == other.Thickness
-                   && CollectionEqualityComparer<Color>.Default.Equals(DashColors, other.DashColors);
-            
+                   && ArrayEqualityComparer<Color>.Default.Equals(DashColors, other.DashColors)
+                   && AntiAlias == other.AntiAlias;
         }
 
         public override bool Equals(object obj)
@@ -59,9 +73,18 @@ namespace CodeArt.DotnetGD
             {
                 var hash = 17;
                 hash = hash * 31 + Thickness;
-                hash = hash * 31 + CollectionEqualityComparer<Color>.Default.GetHashCode(DashColors);
+                hash = hash * 31 + ArrayEqualityComparer<Color>.Default.GetHashCode(DashColors);
+                hash = hash * 31 + AntiAlias.GetHashCode();
                 return hash;
             }
         }
+
+        public static bool Equals(Pen pen1, Pen pen2)
+        {
+            if (ReferenceEquals(pen1, pen2)) return true;
+            if (pen1 == null || pen2 == null) return false;
+            return pen1.Equals(pen2);
+        }
+
     }
 }
