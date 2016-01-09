@@ -1091,6 +1091,34 @@ namespace CodeArt.DotnetGD.Libgd
             CheckForLibgdError();
             return res;
         }
+
+        public static void gdImageFilledArc(GdImage* im, int cx, int cy, int w, int h, int s, int e, int color, int style)
+        {
+            ResetError();
+            NativeMethods.gdImageFilledArc(im, cx, cy, w, h, s, e, color, style);
+            CheckForLibgdError();
+        }
+
+        public static void gdImageArc(GdImage* im, int cx, int cy, int w, int h, int s, int e, int color)
+        {
+            ResetError();
+            NativeMethods.gdImageArc(im, cx, cy, w, h, s, e, color);
+            CheckForLibgdError();
+        }
+
+        public static void gdImageFill(GdImage* im, int x, int y, int color)
+        {
+            ResetError();
+            NativeMethods.gdImageFill(im, x, y, color);
+            CheckForLibgdError();
+        }
+
+        public static void gdImageFillToBorder(GdImage* im, int x, int y, int border, int color)
+        {
+            ResetError();
+            NativeMethods.gdImageFillToBorder(im, x, y, border, color);
+            CheckForLibgdError();
+        }
         // ReSharper restore InconsistentNaming
     }
 }

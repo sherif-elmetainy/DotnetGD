@@ -97,6 +97,113 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        public void Fill(Point point, Color color)
+        {
+            CheckObjectDisposed();
+            NativeWrappers.gdImageFill(ImagePtr, point.X, point.Y, ResolveColor(color));
+        }
+
+
+        public void Fill(Point point, Image tile)
+        {
+            CheckObjectDisposed();
+            SetTile(tile);
+            NativeWrappers.gdImageFill(ImagePtr, point.X, point.Y, GdTiled);
+        }
+
+        public void Fill(Point point, Color color, Color border)
+        {
+            CheckObjectDisposed();
+            NativeWrappers.gdImageFillToBorder(ImagePtr, point.X, point.Y, ResolveColor(border), ResolveColor(color));
+        }
+
+        public void Fill(Point point, Image tile, Color border)
+        {
+            CheckObjectDisposed();
+            SetTile(tile);
+            NativeWrappers.gdImageFillToBorder(ImagePtr, point.X, point.Y, ResolveColor(border), GdTiled);
+        }
+
+        #region DrawArc overloads
+
+        /// <summary>
+        /// Draws an arc of a circle
+        /// </summary>
+        /// <param name="centerPoint">center point</param>
+        /// <param name="ellipseSize">size of the ellipse</param>
+        /// <param name="startAngle">start angle in degrees where 0 is right most and angles are changing clockwise.</param>
+        /// <param name="endAngle">end angle in degrees where 0 is right most and angles are changing clockwise.</param>
+        /// <param name="color">Color</param>
+        public void DrawArc(Point centerPoint, Size ellipseSize, int startAngle, int endAngle, Color color)
+            => DrawArc(centerPoint, ellipseSize, startAngle, endAngle, new Pen(color));
+
+
+        /// <summary>
+        /// Draws an arc of a circle
+        /// </summary>
+        /// <param name="centerPoint">center point</param>
+        /// <param name="ellipseSize">size of the ellipse</param>
+        /// <param name="startAngle">start angle in degrees where 0 is right most and angles are changing clockwise.</param>
+        /// <param name="endAngle">end angle in degrees where 0 is right most and angles are changing clockwise.</param>
+        /// <param name="pen">pen</param>
+        public void DrawArc(Point centerPoint, Size ellipseSize, int startAngle, int endAngle, Pen pen)
+        {
+            if (pen != null && pen.DashColors.Length > 1)
+                throw new ArgumentException("Styled pens are supported for line drawing only.", nameof(pen));
+            CheckObjectDisposed();
+            SetPen(pen);
+            NativeWrappers.gdImageArc(ImagePtr, centerPoint.X, centerPoint.Y, ellipseSize.Width, ellipseSize.Height, startAngle, endAngle, GetPenColor(pen));
+        }
+
+        /// <summary>
+        /// Draws an arc of a circle
+        /// </summary>
+        /// <param name="centerPoint">center point</param>
+        /// <param name="ellipseSize">size of the ellipse</param>
+        /// <param name="startAngle">start angle in degrees where 0 is right most and angles are changing clockwise.</param>
+        /// <param name="endAngle">end angle in degrees where 0 is right most and angles are changing clockwise.</param>
+        /// <param name="brush">brush</param>
+        public void DrawArc(Point centerPoint, Size ellipseSize, int startAngle, int endAngle, Image brush)
+        {
+            CheckObjectDisposed();
+            SetBrush(brush);
+            NativeWrappers.gdImageArc(ImagePtr, centerPoint.X, centerPoint.Y, ellipseSize.Width, ellipseSize.Height, startAngle, endAngle, GdBrushed);
+        }
+
+        /// <summary>
+        /// Draws an arc of a circle
+        /// </summary>
+        /// <param name="centerPoint">center point</param>
+        /// <param name="ellipseSize">size of the ellipse</param>
+        /// <param name="startAngle">start angle in degrees where 0 is right most and angles are changing clockwise.</param>
+        /// <param name="endAngle">end angle in degrees where 0 is right most and angles are changing clockwise.</param>
+        /// <param name="color">color</param>
+        /// <param name="styles">arc styles</param>
+        public void DrawFilledArc(Point centerPoint, Size ellipseSize, int startAngle, int endAngle, Color color, ArcStyles styles = ArcStyles.Arc)
+        {
+            CheckObjectDisposed();
+            var c = ResolveColor(color);
+            NativeWrappers.gdImageFilledArc(ImagePtr, centerPoint.X, centerPoint.Y, ellipseSize.Width, ellipseSize.Height, startAngle, endAngle, c, (int)styles);
+        }
+
+        /// <summary>
+        /// Draws an arc of a circle
+        /// </summary>
+        /// <param name="centerPoint">center point</param>
+        /// <param name="ellipseSize">size of the ellipse</param>
+        /// <param name="startAngle">start angle in degrees where 0 is right most and angles are changing clockwise.</param>
+        /// <param name="endAngle">end angle in degrees where 0 is right most and angles are changing clockwise.</param>
+        /// <param name="tile">brush</param>
+        /// <param name="styles">arc styles</param>
+        public void DrawFilledArc(Point centerPoint, Size ellipseSize, int startAngle, int endAngle, Image tile, ArcStyles styles = ArcStyles.Arc)
+        {
+            CheckObjectDisposed();
+            SetTile(tile);
+            NativeWrappers.gdImageFilledArc(ImagePtr, centerPoint.X, centerPoint.Y, ellipseSize.Width, ellipseSize.Height, startAngle, endAngle, GdTiled, (int) styles);
+        }
+
+        #endregion
+
         #region DrawLine overloads
 
         /// <summary>
@@ -203,21 +310,17 @@ namespace CodeArt.DotnetGD
         /// <param name="center">center of the ellipse</param>
         /// <param name="size">width and height of the ellipse (i.e. radii * 2)</param>
         /// <param name="color">color</param>
-        public void DrawEllipse(Point center, Size size, Color color)
+        public void DrawEllipse(Point center, Size size, Color color) => DrawEllipse(center, size, new Pen(color));
+        
+        public void DrawEllipse(Point center, Size size, Pen pen)
         {
+            if (pen != null && pen.DashColors.Length > 1)
+                throw new ArgumentException("Styled pens are supported for line drawing only.", nameof(pen));
             CheckObjectDisposed();
-            SetPen(null);
-            var resolvedColor = ResolveColor(color);
-            NativeWrappers.gdImageEllipse(ImagePtr, center.X, center.Y, size.Width, size.Height, resolvedColor);
-        }
+            SetPen(pen);
 
-        // Removed because style works with line drawing functions (gdImageLine, gdImageRectangle, gdImagePolygon, etc)
-        //public void DrawEllipse(Point center, Size size, Pen pen)
-        //{
-        //    CheckObjectDisposed();
-        //    SetPen(pen);
-        //    NativeWrappers.gdImageEllipse(ImagePtr, center.X, center.Y, size.Width, size.Height, GdStyled);
-        //}
+            NativeWrappers.gdImageEllipse(ImagePtr, center.X, center.Y, size.Width, size.Height, GetPenColor(pen));
+        }
 
         /// <summary>
         /// Draws an ellipse using a brush

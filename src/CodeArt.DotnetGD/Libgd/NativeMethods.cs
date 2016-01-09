@@ -356,6 +356,20 @@ namespace CodeArt.DotnetGD.Libgd
         [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
         [return: MarshalAs(UnmanagedType.LPStr)]
         public static extern string gdVersionString();
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern void gdImageFilledArc(GdImage* im, int cx, int cy, int w, int h, int s, int e, 
+            int color,
+            int style);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern void gdImageArc(GdImage* im, int cx, int cy, int w, int h, int s, int e, int color);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern void gdImageFill(GdImage* im, int x, int y, int color);
+
+        [DllImport(LibgdName, CallingConvention = DefaultCallingConvention)]
+        public static extern void gdImageFillToBorder(GdImage* im, int x, int y, int border, int color);
     }
 
 

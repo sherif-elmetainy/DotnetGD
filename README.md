@@ -15,10 +15,13 @@ Dotnet GD is an open source managed wrapper around [libgd](https://github.com/li
 * 2D matrix transformations
 * Various image processing functions such as grayscale, negate, pixelate, scatter, etc.
 
+
 ## TODO List include:
 * Better handling for fonts. Currently font names are passed using is a file name relative to the application base folder. The extension .ttf is added if the name has no extension. And a check is done to verify that font file exists. This is done because passing an invalid font name causes libgd to crash the process.
 * Extension methods to provide some overloads for methods (for convenience when using the library).
 * More unit tests and bug fixing.
+* More drawing functions not implemented by libgd (DrawBezier, DrawCurve)
+* Measure string function
 * Mac testing and support.
 * Documentation!
 

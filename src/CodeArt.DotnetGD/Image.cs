@@ -90,6 +90,7 @@ namespace CodeArt.DotnetGD
 
         internal void AddReference()
         {
+            CheckObjectDisposed();
             Interlocked.Increment(ref _references);
         }
 
