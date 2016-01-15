@@ -45,9 +45,9 @@ namespace CodeArt.DotnetGD.Libgd
 
 
             _data = IntPtr.Zero;
-            _key = Interlocked.Increment(ref _currentKey);
             lock (Streams)
             {
+                _key = _currentKey++;
                 Streams.Add(_key, stream);
             }
         }
