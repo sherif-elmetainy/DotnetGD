@@ -1,12 +1,15 @@
 ﻿// Copyright (c) Sherif Elmetainy (Code Art). 
 // Licensed under the MIT License, See License.txt in the repository root for license information.
 
+using System;
+using Microsoft.Extensions.PlatformAbstractions;
 using Xunit;
 
 namespace CodeArt.DotnetGD.Tests
 {
     public class MatrixTests
     {
+        
         [Theory]
         [InlineData("Test_1.png")]
         public void ScaleAndRotate(string fileName)
@@ -16,7 +19,7 @@ namespace CodeArt.DotnetGD.Tests
                 var matrix = Matrix.Identity.Scale(0.5, 2).Rotate(45);
                 using (var target = img.Transform(img.Bounds, matrix))
                 {
-                    target.CompareToReferenceImage(fileName);
+                    target.CompareToReferenceImage(PlatformServices.Default.Runtime.RuntimeArchitecture + fileName);
                 }
             }
         }
@@ -30,7 +33,7 @@ namespace CodeArt.DotnetGD.Tests
                 var matrix = Matrix.Identity.Scale(0.5, 2, MatrixOrder.Append).Rotate(45, MatrixOrder.Append);
                 using (var target = img.Transform(img.Bounds, matrix))
                 {
-                    target.CompareToReferenceImage(fileName);
+                    target.CompareToReferenceImage(PlatformServices.Default.Runtime.RuntimeArchitecture + fileName);
                 }
             }
         }

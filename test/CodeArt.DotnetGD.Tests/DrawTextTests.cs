@@ -9,7 +9,7 @@ namespace CodeArt.DotnetGD.Tests
 {
     public class DrawTextTests
     {
-        
+
         [Theory]
         [InlineData("Hello world!", "HelloWorldEn", DrawStringFlags.Default)]
         [InlineData("مرحبا بالعالم!", "HelloWorldAr", DrawStringFlags.RunBidi | DrawStringFlags.ArabicShaping)]
@@ -37,7 +37,7 @@ namespace CodeArt.DotnetGD.Tests
                     image.DrawFilledRectangle(new Rectangle(0, 0, image.Width - 1, image.Height - 1), white);
                     var f = Guid.NewGuid().ToString("n");
 
-                    image.DrawString(f, new Point(40, 40), f,  12, 0, black);
+                    image.DrawString(f, new Point(40, 40), f, 12, 0, black);
                 }
             });
         }

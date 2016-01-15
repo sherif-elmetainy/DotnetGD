@@ -66,9 +66,9 @@ namespace CodeArt.DotnetGD.Libgd
             Otherwise it is invoked by the first thread to invoke
             gdImageStringFT, with a very small but real risk of a race condition.
             Return 0 on success, nonzero on failure to initialize freetype. */
-            int result = NativeMethods.gdFontCacheSetup();
-            if (result != 0)
-                ThrowLibgdException($"Failed to initialize font cache. Call result: {result}.", nameof(NativeMethods.gdFontCacheSetup));
+            //var result = NativeMethods.gdFontCacheSetup();
+            //if (result != 0)
+            //    ThrowLibgdException($"Failed to initialize font cache. Call result: {result}.", nameof(NativeMethods.gdFontCacheSetup));
         }
 
         /// <summary>

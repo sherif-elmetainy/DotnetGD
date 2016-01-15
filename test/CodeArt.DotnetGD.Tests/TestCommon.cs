@@ -1,12 +1,14 @@
 ﻿// Copyright (c) Sherif Elmetainy (Code Art). 
 // Licensed under the MIT License, See License.txt in the repository root for license information.
 
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using CodeArt.DotnetGD.Formatters;
 using Microsoft.Extensions.PlatformAbstractions;
 using Xunit;
+using System.Collections.Generic;
 
 namespace CodeArt.DotnetGD.Tests
 {
@@ -47,11 +49,31 @@ namespace CodeArt.DotnetGD.Tests
             return ImageFormatter.ReadImageFromFile(imagePath);
         }
 
+        public static string GetRuntimeId(this IRuntimeEnvironment env)
+        {
+            var os = env.OperatingSystem ?? string.Empty;
+            if (string.Equals(os, "Windows", StringComparison.OrdinalIgnoreCase))
+            {
+                os = "win";
+            }
+            else if (string.Equals(os, "Darwin", StringComparison.OrdinalIgnoreCase))
+            {
+                os = "osx";
+            }
+            else if (string.Equals(os, "Linux", StringComparison.OrdinalIgnoreCase))
+            {
+                var ver = env.OperatingSystemVersion ?? string.Empty;
+                var split = ver.Split(new[] { ' ' }, 2);
+                os = split.Length == 2 ? split[0].ToLowerInvariant() : "linux";
+            }
+            return os + "_" + env.RuntimeArchitecture.ToLowerInvariant();
+        }
+
         private static void CompareToReferenceImageInternal(Image image, string referenceImage)
         {
             var basePath = PlatformServices.Default.Application.ApplicationBasePath;
             var formatter = new PngImageFormatter();
-            var imagePath = Path.Combine(basePath, "ReferenceImages", Path.ChangeExtension(referenceImage, formatter.DefaultExtension));
+            var imagePath = Path.Combine(basePath, "ReferenceImages", GetRuntimeId(PlatformServices.Default.Runtime), Path.ChangeExtension(referenceImage, formatter.DefaultExtension));
 
             if (!File.Exists(imagePath))
             {
