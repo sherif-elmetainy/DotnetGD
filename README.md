@@ -26,7 +26,7 @@ Dotnet GD is an open source managed wrapper around [libgd](https://github.com/li
 * Documentation!
 
 ## Known Issues:
-* While all the unit tests current pass on Windows and Ubuntu, I discovered that the system is low on memory, there are random crashes, seg faults, etc and core dumps. This is most likely an issue with libgd or one of its dependencies not handling memory allocation failure correctly.
+* While all the unit tests current pass on Windows and Ubuntu, I discovered that when the system is low on memory, there are random crashes. This is most likely an issue with libgd or one of its dependencies not handling memory allocation failure correctly (with libgd rather than its dependencies being the most likely reason).
 
 
 The library is tested to work in DNX451 and DNXCORE50 on Windows 32-bit and 64-bit and on DNXCORE50 Ubuntu 64-bit. 
