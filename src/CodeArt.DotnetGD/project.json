@@ -30,7 +30,6 @@
   "packInclude": {
     "runtimes/win7-x64/native/": "runtimes/win7-x64/native/*",
     "runtimes/win7-x86/native/": "runtimes/win7-x86/native/*",
-    "runtimes/osx/native/": "runtimes/osx/native/*",
-    "runtimes/linux-x64/native/": "runtimes/linux-x64/native/*"
+    "runtimes/osx/native/": "runtimes/osx/native/*"
   }
 }
