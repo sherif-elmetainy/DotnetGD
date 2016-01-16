@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Threading;
 
 namespace CodeArt.DotnetGD.Libgd
 {
@@ -159,8 +158,5 @@ namespace CodeArt.DotnetGD.Libgd
                 Streams.Remove(_key);
             }
         }
-
     }
-
-
 }

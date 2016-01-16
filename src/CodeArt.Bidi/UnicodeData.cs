@@ -100,7 +100,7 @@ namespace CodeArt.Bidi
                 {
                     var x = codepoint & 0xffff;
                     var u = codepoint >> 16 * ((1 << 5) - 1);
-                    var w = (u * 0xffff) - 1;
+                    var w = u * 0xffff - 1;
                     sb.Append((char)(HiSurrogateStart | (w << 6) | x >> 10));
                     sb.Append((char)(LoSurrogateStart | x & ((1 << 10) - 1)));
                 }

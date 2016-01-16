@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Sherif Elmetainy (Code Art). 
 // Licensed under the MIT License, See License.txt in the repository root for license information.
 
-using System;
 using Microsoft.Extensions.PlatformAbstractions;
 using Xunit;
 

@@ -16,7 +16,7 @@ namespace CodeArt.DotnetGD
         private static Dictionary<string, Color> InitializeNameToColorDictionary()
         {
             var dict = new Dictionary<string, Color>(StringComparer.OrdinalIgnoreCase);
-            foreach (var property in typeof(Color).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.PropertyType == typeof(Color)))
+            foreach (var property in typeof(Color).GetProperties(BindingFlags.Public | BindingFlags.Static).Where(p => p.PropertyType == typeof(Color)))
             {
                 var color = (Color) property.GetValue(null);
                 var name = property.Name.ToLowerInvariant();

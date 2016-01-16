@@ -8,7 +8,6 @@ using System.Runtime.CompilerServices;
 using CodeArt.DotnetGD.Formatters;
 using Microsoft.Extensions.PlatformAbstractions;
 using Xunit;
-using System.Collections.Generic;
 
 namespace CodeArt.DotnetGD.Tests
 {

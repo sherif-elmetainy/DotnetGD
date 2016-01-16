@@ -15,8 +15,8 @@ namespace CodeArt.Bidi
         {
             /* check for range 0x200c to 0x200f (ZWNJ, ZWJ, LRM, RLM) or
                                0x202a to 0x202e (LRE, RLE, PDF, LRO, RLO) */
-            return (((c & 0xfffffffc) == 0x200c) || ((c >= 0x202a) && (c <= 0x202e))
-                                                 || ((c >= 0x2066) && (c <= 0x2069)));
+            return ((c & 0xfffffffc) == 0x200c) || ((c >= 0x202a) && (c <= 0x202e))
+                   || ((c >= 0x2066) && (c <= 0x2069));
         }
 
         private static readonly char[] LineBreakChars = {'\r', '\n'};

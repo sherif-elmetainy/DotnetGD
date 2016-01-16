@@ -42,6 +42,16 @@ namespace CodeArt.DotnetGD
             
         }
 
+        public Color(long r, long g, long b) : this(AlphaOpaque, (byte)r, (byte)g, (byte)b)
+        {
+
+        }
+
+        public Color(ulong r, ulong g, ulong b) : this(AlphaOpaque, (byte)r, (byte)g, (byte)b)
+        {
+
+        }
+
         public Color(byte a, byte r, byte g, byte b)
         {
             Argb = ((r & 0xffu) << 16) | ((g & 0xffu) << 8) | (b & 0xffu) | ((a & (uint)AlphaOpaque) << 24);
@@ -50,6 +60,54 @@ namespace CodeArt.DotnetGD
         public Color(string htmlColor)
         {
             this = ColorNameConverter.FromHtmlColor(htmlColor);
+        }
+
+        public Color(float hue, float saturation, float brightness)
+        {
+            if (saturation < 0 || saturation > 1) throw new ArgumentOutOfRangeException(nameof(saturation), saturation, "Saturation must be between 0 and 1.");
+            if (brightness < 0 || brightness > 1) throw new ArgumentOutOfRangeException(nameof(brightness), brightness, "Brightness must be between 0 and 1.");
+            if (hue < 0 || hue >= 360) throw new ArgumentOutOfRangeException(nameof(hue), hue, "Brightness must be between 0 and 360.");
+            var c = (1 - Math.Abs(2 * brightness - 1)) * saturation;
+            var x = c * (1 - Math.Abs((int)Math.Round(hue) / 60 % 2 - 1));
+            var m = brightness - c / 2;
+            float r, g, b;
+            if (hue < 60)
+            {
+                r = c;
+                g = x;
+                b = 0;
+            }
+            else if (hue < 120)
+            {
+                r = x;
+                g = c;
+                b = 0;
+            }
+            else if (hue < 180)
+            {
+                r = 0;
+                g = c;
+                b = x;
+            }
+            else if (hue < 240)
+            {
+                r = 0;
+                g = x;
+                b = c;
+            }
+            else if (hue < 300)
+            {
+                r = x;
+                g = 0;
+                b = c;
+            }
+            else
+            {
+                r = c;
+                g = 0;
+                b = x;
+            }
+            this = new Color((byte)Math.Round((r + m) * 255), (byte)Math.Round((g + m) * 255), (byte)Math.Round((b + m) * 255));
         }
 
         public override bool Equals(object obj)

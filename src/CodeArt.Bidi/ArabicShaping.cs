@@ -214,17 +214,10 @@ public class ArabicShaping
         {
             throw new ArgumentException("bad DIGITS options");
         }
-        _isLogical = ((options & ArabicShapingOptions.TextDirectionMask) == ArabicShapingOptions.TextDirectionLogical);
+        _isLogical = (options & ArabicShapingOptions.TextDirectionMask) == ArabicShapingOptions.TextDirectionLogical;
         /* Validate options */
-        _spacesRelativeToTextBeginEnd = ((options & ArabicShapingOptions.SpacesRelativeToTextMask) == ArabicShapingOptions.SpacesRelativeToTextBeginEnd);
-        if ((options & ArabicShapingOptions.ShapeTailTypeMask) == ArabicShapingOptions.ShapeTailNewUnicode)
-        {
-            _tailChar = NewTailChar;
-        }
-        else
-        {
-            _tailChar = OldTailChar;
-        }
+        _spacesRelativeToTextBeginEnd = (options & ArabicShapingOptions.SpacesRelativeToTextMask) == ArabicShapingOptions.SpacesRelativeToTextBeginEnd;
+        _tailChar = (options & ArabicShapingOptions.ShapeTailTypeMask) == ArabicShapingOptions.ShapeTailNewUnicode ? NewTailChar : OldTailChar;
     }
 
     private const char HamzafeChar = '\ufe80';
@@ -516,7 +509,7 @@ public class ArabicShaping
         1
     };
 
-    private static int[] _convertFEto06 = {
+    private static readonly int[] ConvertFEto06 = {
         /***********0******1******2******3******4******5******6******7******8******9******A******B******C******D******E******F***/
         /*FE7*/   0x64B, 0x64B, 0x64C, 0x64C, 0x64D, 0x64D, 0x64E, 0x64E, 0x64F, 0x64F, 0x650, 0x650, 0x651, 0x651, 0x652, 0x652,
         /*FE8*/   0x621, 0x622, 0x622, 0x623, 0x623, 0x624, 0x624, 0x625, 0x625, 0x626, 0x626, 0x626, 0x626, 0x627, 0x627, 0x628,
@@ -701,7 +694,7 @@ public class ArabicShaping
      */
     private static bool IsTashkeelChar(char ch)
     {
-        return (ch >= '\u064B' && ch <= '\u0652');
+        return ch >= '\u064B' && ch <= '\u0652';
     }
     /*
      *Name     : isSeenTailFamilyChar
@@ -751,7 +744,7 @@ public class ArabicShaping
      */
     private static bool IsAlefMaksouraChar(char ch)
     {
-        return ((ch == 0xFEEF) || (ch == 0xFEF0) || (ch == 0x0649));
+        return (ch == 0xFEEF) || (ch == 0xFEF0) || (ch == 0x0649);
     }
     /*
      * Name     : isYehHamzaChar
@@ -773,7 +766,7 @@ public class ArabicShaping
      */
     private static bool IsTashkeelCharFe(char ch)
     {
-        return (ch != 0xFE75 && (ch >= 0xFE70 && ch <= 0xFE7F));
+        return ch != 0xFE75 && ch >= 0xFE70 && ch <= 0xFE7F;
     }
     /*
      * Name: isTashkeelOnTatweelChar
@@ -806,7 +799,7 @@ public class ArabicShaping
     {
         if (ch >= 0xfe70 && ch <= 0xfe7f && ch != NewTailChar && ch != 0xFE75)
         {
-            return (1 - TashkeelMedial[ch - 0xFE70]);
+            return 1 - TashkeelMedial[ch - 0xFE70];
         }
         if (ch >= 0xfc5e && ch <= 0xfc63)
         {
@@ -927,11 +920,10 @@ public class ArabicShaping
      */
     public static int FlipArray(char[] dest, int start, int e, int w)
     {
-        int r;
         if (w > start)
         {
             // shift, assume small buffer size so don't use arraycopy
-            r = w;
+            var r = w;
             w = start;
             while (r < e)
             {
@@ -958,11 +950,11 @@ public class ArabicShaping
         int i;
         for (i = 0; i < sourceLength; i++)
         {
-            if ((IsTashkeelOnTatweelChar(dest[i]) == 1))
+            if (IsTashkeelOnTatweelChar(dest[i]) == 1)
             {
                 dest[i] = TatweelChar;
             }
-            else if ((IsTashkeelOnTatweelChar(dest[i]) == 2))
+            else if (IsTashkeelOnTatweelChar(dest[i]) == 2)
             {
                 dest[i] = ShaddaTatweelChar;
             }
@@ -1370,7 +1362,7 @@ public class ArabicShaping
                 {
                     ++lacount;
                 }
-                dest[i] = (char)_convertFEto06[ch - '\uFE70'];
+                dest[i] = (char)ConvertFEto06[ch - '\uFE70'];
             }
         }
         return lacount;
@@ -1387,18 +1379,18 @@ public class ArabicShaping
     private int DeshapeNormalize(char[] dest, int start, int length)
     {
         var lacount = 0;
-        var yehHamzaComposeEnabled = ((_options & ArabicShapingOptions.YehhamzaMask) == ArabicShapingOptions.YehhamzaTwocellNear) ? 1 : 0;
-        var seenComposeEnabled = ((_options & ArabicShapingOptions.SeenMask) == ArabicShapingOptions.SeenTwocellNear) ? 1 : 0;
+        var yehHamzaComposeEnabled = (_options & ArabicShapingOptions.YehhamzaMask) == ArabicShapingOptions.YehhamzaTwocellNear ? 1 : 0;
+        var seenComposeEnabled = (_options & ArabicShapingOptions.SeenMask) == ArabicShapingOptions.SeenTwocellNear ? 1 : 0;
         for (int i = start, e = i + length; i < e; ++i)
         {
             var ch = dest[i];
             if ((yehHamzaComposeEnabled == 1) && ((ch == Hamza06Char) || (ch == HamzafeChar))
-                   && (i < (length - 1)) && IsAlefMaksouraChar(dest[i + 1]))
+                   && (i < length - 1) && IsAlefMaksouraChar(dest[i + 1]))
             {
                 dest[i] = SpaceChar;
                 dest[i + 1] = YehHamzaChar;
             }
-            else if ((seenComposeEnabled == 1) && (IsTailChar(ch)) && (i < (length - 1))
+            else if ((seenComposeEnabled == 1) && IsTailChar(ch) && (i < length - 1)
                           && (IsSeenTailFamilyChar(dest[i + 1]) == 1))
             {
                 dest[i] = SpaceChar;
@@ -1409,7 +1401,7 @@ public class ArabicShaping
                 {
                     ++lacount;
                 }
-                dest[i] = (char)_convertFEto06[ch - '\uFE70'];
+                dest[i] = (char)ConvertFEto06[ch - '\uFE70'];
             }
         }
         return lacount;

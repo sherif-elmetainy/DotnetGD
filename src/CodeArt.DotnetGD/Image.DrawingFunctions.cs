@@ -559,7 +559,7 @@ namespace CodeArt.DotnetGD
         {
             var alpha = unchecked(((uint)color & 0xff000000) >> 24);
             alpha = alpha == 127 ? 0 : 255 - alpha * 2;
-            return new Color(unchecked(((uint)color & 0x00ffffff)) | (alpha << 24));
+            return new Color(unchecked((uint)color & 0x00ffffff) | (alpha << 24));
         }
 
         /// <summary>

@@ -25,10 +25,10 @@ Dotnet GD is an open source managed wrapper around [libgd](https://github.com/li
 * Mac testing and support.
 * Documentation!
 
+## Known Issues:
+* While all the unit tests current pass on Windows and Ubuntu, I discovered that the system is low on memory, there are random crashes, seg faults, etc and core dumps. This is most likely an issue with libgd or one of its dependencies not handling memory allocation failure correctly.
+
 
 The library is tested to work in DNX451 and DNXCORE50 on Windows 32-bit and 64-bit and on DNXCORE50 Ubuntu 64-bit. 
-
-Currently several unit tests cause Linux to core dump and/or throw exceptions (which are apparently random because they are different exception everytime the tests are run.) I already fixed an issue in libgd that was causing core dump on Linux and Access violation on Windows. I currently investigating know the causes of the instability on Linux which can be libgd, DotNetGD code or even dnx itself.
-
 
 I still have not built libgd for Mac and I don't have a Mac machine to test it. The library include native libgd built for Windows 32 and 64-bit versions and Ubuntu 64-bit. For MAC and other Linux distributions, libgd need to be built for that OS and included in runtimes/--OSMoniker--/native/. When I get my hands on a MAC machine, I will build libgd for MAC, but it's not practical to build libgd for all Linux distributions.

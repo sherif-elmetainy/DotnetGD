@@ -234,7 +234,7 @@ namespace CodeArt.DotnetGD
             if (newSize.Width <= 0 || newSize.Height <= 0)
                 throw new ArgumentException($"Invalid image size {newSize}.", nameof(newSize));
             if (method < InterpolationMethod.Default || method >= InterpolationMethod.Invalid)
-                throw new ArgumentOutOfRangeException(nameof(method), method, $"Invalid interpolation method.");
+                throw new ArgumentOutOfRangeException(nameof(method), method, "Invalid interpolation method.");
             CheckObjectDisposed();
 
             NativeWrappers.gdImageSetInterpolationMethod(ImagePtr, method);
@@ -244,7 +244,7 @@ namespace CodeArt.DotnetGD
         public Image Rotate(float angle, Color bgColor, InterpolationMethod method = InterpolationMethod.Default)
         {
             if (method < InterpolationMethod.Default || method >= InterpolationMethod.Invalid)
-                throw new ArgumentOutOfRangeException(nameof(method), method, $"Invalid interpolation method.");
+                throw new ArgumentOutOfRangeException(nameof(method), method, "Invalid interpolation method.");
             CheckObjectDisposed();
             var c = ResolveColor(bgColor);
             NativeWrappers.gdImageSetInterpolationMethod(ImagePtr, method);
