@@ -28,20 +28,36 @@ namespace CodeArt.DotnetGD.Libgd
         [UnmanagedFunctionPointer(CallbackConvention)]
         private delegate int SeekDelegate(GdIoCtx* ioCtx, int offset);
         [UnmanagedFunctionPointer(CallbackConvention)]
-        private delegate long TellDelegate(GdIoCtx* ioCtx);
+        private delegate int TellDelegate(GdIoCtx* ioCtx);
         [UnmanagedFunctionPointer(CallbackConvention)]
         private delegate void GdFreeDelegate(GdIoCtx* ioCtx);
+        
+        private static readonly GetCDelelegate GetCDel = GetC;
+        private static readonly GetBufDelegate GetBufDel = GetBuf;
+        private static readonly PutCDelegate PutCDel = PutC;
+        private static readonly PutBufDelegate PutBufDel = PutBuf;
+        private static readonly SeekDelegate SeekDel = Seek;
+        private static readonly TellDelegate TellDel = Tell;
+        private static readonly GdFreeDelegate GdFreeDel = GdFree;
+        
+        private static readonly IntPtr GetCPtr = Marshal.GetFunctionPointerForDelegate(GetCDel);
+        private static readonly IntPtr GetBufPtr = Marshal.GetFunctionPointerForDelegate(GetBufDel);
+        private static readonly IntPtr PutCPtr = Marshal.GetFunctionPointerForDelegate(PutCDel);
+        private static readonly IntPtr PutBufPtr = Marshal.GetFunctionPointerForDelegate(PutBufDel);
+        private static readonly IntPtr SeekPtr = Marshal.GetFunctionPointerForDelegate(SeekDel);
+        private static readonly IntPtr TellPtr = Marshal.GetFunctionPointerForDelegate(TellDel);
+        private static readonly IntPtr GdFreePtr = Marshal.GetFunctionPointerForDelegate(GdFreeDel);
 
         public GdIoCtx(Stream stream)
         {
             // Setup callbacks called by libgd to read from or write to the stream
-            _getC = Marshal.GetFunctionPointerForDelegate<GetCDelelegate>(GetC);
-            _getBuff = Marshal.GetFunctionPointerForDelegate<GetBufDelegate>(GetBuf);
-            _putC = Marshal.GetFunctionPointerForDelegate<PutCDelegate>(PutC);
-            _putBuf = Marshal.GetFunctionPointerForDelegate<PutBufDelegate>(PutBuf);
-            _seek = Marshal.GetFunctionPointerForDelegate<SeekDelegate>(Seek);
-            _tell = Marshal.GetFunctionPointerForDelegate<TellDelegate>(Tell);
-            _gdFree = Marshal.GetFunctionPointerForDelegate<GdFreeDelegate>(GdFree);
+            _getC = GetCPtr;
+            _getBuff = GetBufPtr;
+            _putC = PutCPtr;
+            _putBuf = PutBufPtr;
+            _seek = SeekPtr;
+            _tell = TellPtr;
+            _gdFree = GdFreePtr;
 
 
             _data = IntPtr.Zero;
@@ -69,24 +85,23 @@ namespace CodeArt.DotnetGD.Libgd
         private static long _currentKey;
         private static readonly Dictionary<long, Stream> Streams = new Dictionary<long, Stream>();
 
-        private Stream Stream
+        private static Stream GetStream(GdIoCtx* ioCtx)
         {
-            get
+            if (ioCtx == null)
             {
-                lock (Streams)
-                {
-                    return Streams[_key];
-                }
+                throw new ArgumentNullException(nameof(ioCtx));
+            }
+            var key = ioCtx->_key;
+            lock (Streams)
+            {
+                return Streams[key];
             }
         }
-        
-
 
 
         private static int GetC(GdIoCtx* ioCtx)
         {
-
-            var stream = (*ioCtx).Stream;
+            var stream = GetStream(ioCtx);
             return stream.ReadByte();
         }
 
@@ -94,7 +109,7 @@ namespace CodeArt.DotnetGD.Libgd
         {
             if (size <= 0)
                 return 0;
-            var stream = (*ioCtx).Stream;
+            var stream = GetStream(ioCtx);
             var managedBuff = new byte[size];
             var res = stream.Read(managedBuff, 0, size);
             Marshal.Copy(managedBuff, 0, buff, res);
@@ -103,7 +118,7 @@ namespace CodeArt.DotnetGD.Libgd
 
         private static void PutC(GdIoCtx* ioCtx, int ch)
         {
-            var stream = (*ioCtx).Stream;
+            var stream = GetStream(ioCtx);
             stream.WriteByte(unchecked((byte)ch));
         }
 
@@ -111,7 +126,7 @@ namespace CodeArt.DotnetGD.Libgd
         {
             if (size <= 0)
                 return 0;
-            var stream = (*ioCtx).Stream;
+            var stream = GetStream(ioCtx);
             var managedBuff = new byte[size];
             Marshal.Copy(buff, managedBuff, 0, size);
             stream.Write(managedBuff, 0, size);
@@ -120,15 +135,15 @@ namespace CodeArt.DotnetGD.Libgd
 
         private static int Seek(GdIoCtx* ioCtx, int offset)
         {
-            var stream = (*ioCtx).Stream;
+            var stream = GetStream(ioCtx);
             stream.Seek(offset, SeekOrigin.Begin);
             return 1;
         }
 
-        private static long Tell(GdIoCtx* ioCtx)
+        private static int Tell(GdIoCtx* ioCtx)
         {
-            var stream = (*ioCtx).Stream;
-            return stream.Position;
+            var stream = GetStream(ioCtx);
+            return (int)stream.Position;
         }
 
         private static void GdFree(GdIoCtx* ioCtx)
