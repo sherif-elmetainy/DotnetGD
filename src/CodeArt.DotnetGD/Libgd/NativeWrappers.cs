@@ -78,6 +78,18 @@ namespace CodeArt.DotnetGD.Libgd
         {
             _currentError = null;
         }
+        
+         /// <summary>
+        /// Throw an exception
+        /// </summary>
+        /// <param name="errorMessage"></param>
+        /// <param name="innerException">inner exception</param>
+        /// <param name="methodName"></param>
+        private static void ThrowException(string errorMessage, Exception innerException, [CallerMemberName] string methodName = null)
+        {
+            var error = $"LIBGD Error: Method {methodName} failed: {errorMessage}";
+            throw new LibgdException(error, innerException);
+        }
 
         /// <summary>
         /// Throw an exception
@@ -320,10 +332,20 @@ namespace CodeArt.DotnetGD.Libgd
 
         public static GdImage* gdImageCreateFromJpegCtxEx(GdIoCtx* input, int ignoreWarning)
         {
-            ResetError();
-            var res = NativeMethods.gdImageCreateFromJpegCtxEx(input, ignoreWarning);
-            CheckImageResult(res);
-            return res;
+            try
+            {
+                ResetError();
+                var res = NativeMethods.gdImageCreateFromJpegCtxEx(input, ignoreWarning);
+                CheckImageResult(res);
+                return res;
+            }
+            catch (NullReferenceException ex)
+            {
+                // On Linux an empty stream causes NullReferenceException to be thrown, to make it consistent we throw LibgdException
+                ThrowException(ex.Message, ex);
+                // Return to make compiler happy
+                return null;
+            }
         }
 
         public static GdImage* gdImageCreateFromJpegPtrEx(int size, IntPtr data, int ignoreWarning)
@@ -439,10 +461,21 @@ namespace CodeArt.DotnetGD.Libgd
 
         public static GdImage* gdImageCreateFromTiffCtx(GdIoCtx* input)
         {
-            ResetError();
-            var res = NativeMethods.gdImageCreateFromTiffCtx(input);
-            CheckImageResult(res);
-            return res;
+            try
+            {
+                ResetError();
+                var res = NativeMethods.gdImageCreateFromTiffCtx(input);
+                CheckImageResult(res);
+                return res;
+            }
+            catch (NullReferenceException ex)
+            {
+                // On Linux an empty stream causes NullReferenceException to be thrown, to make it consistent we throw LibgdException
+                ThrowException(ex.Message, ex);
+                // Return to make compiler happy
+                return null;
+            }
+            
         }
 
         public static GdImage* gdImageCreateFromTiffPtr(int size, IntPtr data)
