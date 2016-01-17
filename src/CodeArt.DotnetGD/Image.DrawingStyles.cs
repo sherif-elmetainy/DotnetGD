@@ -10,14 +10,36 @@ namespace CodeArt.DotnetGD
 {
     public unsafe partial class Image
     {
+        /// <summary>
+        /// Currently used pen
+        /// </summary>
         private Pen _pen;
+        /// <summary>
+        /// Currently used brush
+        /// </summary>
         private Image _brush;
+        /// <summary>
+        /// Currently used tile
+        /// </summary>
         private Image _tile;
 
+        /// <summary>
+        /// Const passed to libgd to draw styled lines (dashed)
+        /// </summary>
         private const int GdStyled = -2;
+        /// <summary>
+        /// Const passed to libgd to draw brushed lines (dashed)
+        /// </summary>
         private const int GdBrushed = -3;
-        //private const int GdStyledBrushed = -4;
+
+        /// <summary>
+        /// Const passed to libgd to fill figures with a tile
+        /// </summary>
         private const int GdTiled = -5;
+
+        /// <summary>
+        /// Const passed to libgd to draw anti-alias lines
+        /// </summary>
         private const int GdAntiAlias = -7;
 
         /// <summary>
@@ -38,6 +60,10 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// Sets the brush used for drawing lines, rectangles and polygons.
+        /// </summary>
+        /// <param name="brush">image to use as brush.</param>
         private void SetBrush(Image brush)
         {
             if (ReferenceEquals(brush, _brush)) return;
@@ -56,6 +82,10 @@ namespace CodeArt.DotnetGD
             SetPen(null);
         }
 
+        /// <summary>
+        /// Sets the tile to use for filling figures.
+        /// </summary>
+        /// <param name="tile"></param>
         private void SetTile(Image tile)
         {
             if (ReferenceEquals(tile, _tile)) return;
@@ -74,6 +104,10 @@ namespace CodeArt.DotnetGD
             SetPen(null);
         }
 
+        /// <summary>
+        /// Set the pen to use for drawing lines, arcs, etc
+        /// </summary>
+        /// <param name="value"></param>
         private void SetPen(Pen value)
         {
             if (Pen.Equals(_pen, value))
@@ -123,6 +157,9 @@ namespace CodeArt.DotnetGD
             _pen = value;
         }
 
+        /// <summary>
+        /// Clears the old line style 
+        /// </summary>
         private void ClearOldLineStyle()
         {
             // when calling gdImageSetStyle old style is freed by libgd

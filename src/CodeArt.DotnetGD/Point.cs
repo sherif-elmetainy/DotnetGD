@@ -13,16 +13,22 @@ namespace CodeArt.DotnetGD
         /// <summary>
         /// constructor.
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
+        /// <param name="x">cartesian X coordinate of the point</param>
+        /// <param name="y">cartesian Y coordinate of the point</param>
         public Point(int x, int y)
         {
             X = x;
             Y = y;
         }
 
+        /// <summary>
+        /// cartesian X coordinate of the point
+        /// </summary>
         public int X { get; }
 
+        /// <summary>
+        /// cartesian Y coordinate of the point
+        /// </summary>
         public int Y { get; }
 
         /// <summary>
@@ -72,10 +78,34 @@ namespace CodeArt.DotnetGD
         {
             return $"({X}, {Y})";
         }
-
+        
+        /// <summary>
+        /// Compare 2 points for equality
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
         public static bool operator ==(Point p1, Point p2) => p1.Equals(p2);
+        /// <summary>
+        /// Compare 2 points for inequality
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
         public static bool operator !=(Point p1, Point p2) => !p1.Equals(p2);
+        /// <summary>
+        /// Offsets a point by size in opposite direction
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static Point operator + (Point p, Size s) => new Point(p.X + s.Width, p.Y + s.Height);
+        /// <summary>
+        /// Offsets a point by size
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static Point operator -(Point p, Size s) => new Point(p.X - s.Width, p.Y - s.Height);
     }
 }

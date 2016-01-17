@@ -9,9 +9,16 @@ using System.Reflection;
 
 namespace CodeArt.DotnetGD
 {
+    /// <summary>
+    /// Helper class for converting color to string and vice versa
+    /// </summary>
     internal static class ColorNameConverter
     {
+        /// <summary>
+        /// Dictionary for mapping color names to colors
+        /// </summary>
         private static readonly Dictionary<string, Color> NameToColorDictionary = InitializeNameToColorDictionary();
+
 
         private static Dictionary<string, Color> InitializeNameToColorDictionary()
         {
@@ -21,6 +28,7 @@ namespace CodeArt.DotnetGD
                 var color = (Color) property.GetValue(null);
                 var name = property.Name.ToLowerInvariant();
                 dict.Add(name, color);
+                // gray has 2 common spellings
                 if (name.EndsWith("gray"))
                 {
                     dict.Add(name.Replace("gray", "grey"), color);
@@ -30,6 +38,9 @@ namespace CodeArt.DotnetGD
             return dict;
         }
 
+        /// <summary>
+        /// Dictionary to map colors to names
+        /// </summary>
         private static readonly Dictionary<Color, string> ColorToNameDictionary = InitializeColorToNameDictionary();
 
 
@@ -44,6 +55,11 @@ namespace CodeArt.DotnetGD
             return dict;
         }
 
+        /// <summary>
+        /// Using HTML color get the Color struct
+        /// </summary>
+        /// <param name="htmlColor">valid values are names like "red", "orange", "darkgreen", etc, or html formats "#aarrggbb", "#rrggbb" or "#rgb".</param>
+        /// <returns></returns>
         public static Color FromHtmlColor(string htmlColor)
         {
             if (string.IsNullOrWhiteSpace(htmlColor))

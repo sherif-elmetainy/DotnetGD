@@ -3,6 +3,9 @@
 
 namespace CodeArt.DotnetGD
 {
+    /// <summary>
+    /// Method used to convert true color images to 8-bit index
+    /// </summary>
     public enum PaletteQuantizationMethod
     {
         Default = 0,

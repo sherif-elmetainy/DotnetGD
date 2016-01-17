@@ -6,7 +6,8 @@ using System;
 namespace CodeArt.DotnetGD
 {
     /// <summary>
-    /// Color structure (similar to the one used in System.Drawing)
+    /// Color structure (has similarities to the one used in System.Drawing). 
+    /// The color structure is immutable and holds a 32-bit unsigned interger color value with 8 bits for each of the alpha, red, green and blue.
     /// </summary>
     /// <remarks>
     ///     In libgd true color is represented as 32 bit signed integer. The sign bit is ignored and always zero.
@@ -26,42 +27,99 @@ namespace CodeArt.DotnetGD
     {
         private const byte AlphaOpaque = 0xff;
         
+        /// <summary>
+        /// The Alpha component of the color. 0xff is fully opaque, 0x00 is fully transparent.
+        /// </summary>
         public byte A => (byte) ((Argb & 0xFF000000) >> 24);
+        /// <summary>
+        /// The Red component of the color
+        /// </summary>
         public byte R => (byte) ((Argb & 0x00FF0000) >> 16);
+
+        /// <summary>
+        /// The green component of the color
+        /// </summary>
         public byte G => (byte)((Argb & 0x0000FF00) >> 8);
+        /// <summary>
+        /// The blue component of the color
+        /// </summary>
         public byte B => (byte)(Argb & 0x000000FF);
+
+        /// <summary>
+        /// 32-bit color value with 8 bits used for each of the components (aarrggbb)
+        /// </summary>
         public uint Argb { get; }
 
+        /// <summary>
+        /// Initializes a new instance of Color
+        /// </summary>
+        /// <param name="argb">32-bit color value with 8 bits used for each of the components (aarrggbb)</param>
         public Color(uint argb)
         {
             Argb = argb;
         }
 
+        /// <summary>
+        /// Initializes a new instance of Color from red, green and blue. Alpha component is considered apaque (0xff).
+        /// </summary>
+        /// <param name="r">red component</param>
+        /// <param name="g">green component</param>
+        /// <param name="b">blue component</param>
         public Color(byte r, byte g, byte b) : this(AlphaOpaque, r, g, b)
         {
             
         }
 
+        /// <summary>
+        /// Initializes a new instance of Color from red, green and blue. Alpha component is considered apaque (0xff).
+        /// </summary>
+        /// <param name="r">red component</param>
+        /// <param name="g">green component</param>
+        /// <param name="b">blue component</param>
         public Color(long r, long g, long b) : this(AlphaOpaque, (byte)r, (byte)g, (byte)b)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of Color from red, green and blue. Alpha component is considered apaque (0xff).
+        /// </summary>
+        /// <param name="r">red component</param>
+        /// <param name="g">green component</param>
+        /// <param name="b">blue component</param>
         public Color(ulong r, ulong g, ulong b) : this(AlphaOpaque, (byte)r, (byte)g, (byte)b)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of Color
+        /// </summary>
+        /// <param name="a">alpha component</param>
+        /// <param name="r">red component</param>
+        /// <param name="g">green component</param>
+        /// <param name="b">blue component</param>
         public Color(byte a, byte r, byte g, byte b)
         {
             Argb = ((r & 0xffu) << 16) | ((g & 0xffu) << 8) | (b & 0xffu) | ((a & (uint)AlphaOpaque) << 24);
         }
 
+        /// <summary>
+        /// Initializes a new instance of color from a string.
+        /// </summary>
+        /// <param name="htmlColor">html color can be either known color name (such as "red", "yellow", "darkblue", etc), 
+        /// "#aarrggbb" as in html (# is required), "#rrggbb" (# is required, alpha is considered ff) or #rgb </param>
         public Color(string htmlColor)
         {
             this = ColorNameConverter.FromHtmlColor(htmlColor);
         }
 
+        /// <summary>
+        /// Initializes the color from hue, saturation and brightness.
+        /// </summary>
+        /// <param name="hue">The angle in degrees around the axis of colors cylinder in the RGB color model. Valid values are from 0 inclusive to 360 exclusive.</param>
+        /// <param name="saturation">The distance from the center of the cylinder. Valid values from 0 inclusive to 1 inclusive.</param>
+        /// <param name="brightness">Brightness or lightness. Valid values from 0 inclusive to 1 inclusive.</param>
         public Color(float hue, float saturation, float brightness)
         {
             if (saturation < 0 || saturation > 1) throw new ArgumentOutOfRangeException(nameof(saturation), saturation, "Saturation must be between 0 and 1.");
@@ -110,33 +168,66 @@ namespace CodeArt.DotnetGD
             this = new Color((byte)Math.Round((r + m) * 255), (byte)Math.Round((g + m) * 255), (byte)Math.Round((b + m) * 255));
         }
 
+        /// <summary>
+        /// Compares Color to another object.
+        /// </summary>
+        /// <param name="obj">object to compare.</param>
+        /// <returns>True if obj is a Color object having the same value, false otherwise.</returns>
         public override bool Equals(object obj)
         {
             return (obj as Color?)?.Argb == Argb;
         }
 
+        /// <summary>
+        /// Gets hashcode of the color object.
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
             return unchecked((int)Argb);
         }
 
+        /// <summary>
+        /// Compares Color to another object.
+        /// </summary>
+        /// <param name="other">color to compare</param>
+        /// <returns>True if the colors have the same value, false otherwise.</returns>
         public bool Equals(Color other)
         {
             return other.Argb == Argb;
         }
 
+        /// <summary>
+        /// String representation of the color (in format #aarrggbb as in HTML)
+        /// </summary>
+        /// <returns> String representation of the color (in format #aarrggbb as in HTML)</returns>
         public override string ToString()
         {
             return $"#{Argb:x8}";
         }
 
+        /// <summary>
+        /// Color name such as "red", "green", "yellow", is the color is a known value, #aarrggbb otherwise.
+        /// </summary>
         public string Name => ColorNameConverter.GetName(this);
 
+        /// <summary>
+        /// compares 2 colors for equality
+        /// </summary>
+        /// <param name="c1"></param>
+        /// <param name="c2"></param>
+        /// <returns></returns>
         public static bool operator ==(Color c1, Color c2)
         {
             return c1.Equals(c2);
         }
 
+        /// <summary>
+        /// compares 2 colors for inquality.
+        /// </summary>
+        /// <param name="c1"></param>
+        /// <param name="c2"></param>
+        /// <returns></returns>
         public static bool operator !=(Color c1, Color c2)
         {
             return !c1.Equals(c2);

@@ -8,6 +8,12 @@ namespace CodeArt.DotnetGD
 {
     public unsafe partial class Image
     {
+        /// <summary>
+        /// creates a *new* image by applying a matrix transform to a rectangle in the source image and returns a *new* image.
+        /// </summary>
+        /// <param name="srcRectangle">source image rectangle</param>
+        /// <param name="matrix">matrix to apply</param>
+        /// <returns></returns>
         public Image Transform(Rectangle srcRectangle, Matrix matrix)
         {
             if (matrix == null) throw new ArgumentNullException(nameof(matrix));
@@ -21,6 +27,13 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// Copies a the pixels from a source image after applying matrix transformation
+        /// </summary>
+        /// <param name="image">source image</param>
+        /// <param name="dstPoint">destination point in the target image.</param>
+        /// <param name="srcRectangle">Source pixels in the source image.</param>
+        /// <param name="matrix">matrix to apply</param>
         public void DrawImage(Image image, Point dstPoint, Rectangle srcRectangle, Matrix matrix)
         {
             if (image == null) throw new ArgumentNullException(nameof(image));

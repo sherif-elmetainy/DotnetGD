@@ -13,16 +13,20 @@ namespace CodeArt.DotnetGD
         /// <summary>
         /// constructor.
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
+        /// <param name="x">cartesian X coordinate of the point</param>
+        /// <param name="y">cartesian Y coordinate of the point</param>
         public PointF(double x, double y)
         {
             X = x;
             Y = y;
         }
-
+        /// <summary>
+        /// cartesian X coordinate of the point
+        /// </summary>
         public double X { get; }
-
+        /// <summary>
+        /// cartesian Y coordinate of the point
+        /// </summary>
         public double Y { get; }
 
         /// <summary>
@@ -75,15 +79,51 @@ namespace CodeArt.DotnetGD
             return $"({X}, {Y})";
         }
 
+        /// <summary>
+        /// Compare 2 points for equality
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
         public static bool operator ==(PointF p1, PointF p2) => p1.Equals(p2);
+        /// <summary>
+        /// Compare 2 points for ineequality
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
         public static bool operator !=(PointF p1, PointF p2) => !p1.Equals(p2);
+        /// <summary>
+        /// Offsets a point by a size
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static PointF operator + (PointF p, Size s) => new PointF(p.X + s.Width, p.Y + s.Height);
+        /// <summary>
+        /// Offsets a point by size in opposite direction
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static PointF operator -(PointF p, Size s) => new PointF(p.X - s.Width, p.Y - s.Height);
-
+        /// <summary>
+        /// convert to a Point to PointF
+        /// </summary>
+        /// <param name="p"></param>
         public static implicit operator PointF(Point p) => new PointF(p.X, p.Y);
+        /// <summary>
+        /// Rounds a PointF
+        /// </summary>
+        /// <param name="p"></param>
         public static explicit operator Point(PointF p) => new Point((int)p.X, (int)p.Y);
 
-
+        /// <summary>
+        /// Compares to two points. This method differs from <see cref="Equals(CodeArt.DotnetGD.PointF)"/> in that two points that are within 1e-6 of each other are considered similar.
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
         public static bool AreSimilar(PointF p1, PointF p2)
             => Math.Abs(p1.X - p2.X) < 1e-6 && Math.Abs(p1.Y - p2.Y) < 1e-6;
 

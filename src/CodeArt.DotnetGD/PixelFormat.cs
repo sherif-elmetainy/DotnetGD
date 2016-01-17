@@ -3,9 +3,18 @@
 
 namespace CodeArt.DotnetGD
 {
+    /// <summary>
+    /// Image pixel format
+    /// </summary>
     public enum PixelFormat
     {
+        /// <summary>
+        /// True color, 32 bit per pixels
+        /// </summary>
         Format32BppArgb = 0,
+        /// <summary>
+        /// 8-bit index
+        /// </summary>
         Format8BppIndexed = 1
     }
 }

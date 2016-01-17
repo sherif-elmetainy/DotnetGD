@@ -97,13 +97,22 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// Performs flood fill by filling all areas connected and having same color as destination point with the specified color.
+        /// </summary>
+        /// <param name="point">Point at which to apply flood fill</param>
+        /// <param name="color">Color to use for filling</param>
         public void Fill(Point point, Color color)
         {
             CheckObjectDisposed();
             NativeWrappers.gdImageFill(ImagePtr, point.X, point.Y, ResolveColor(color));
         }
 
-
+        /// <summary>
+        /// Performs flood fill by filling all areas connected and having same color as destination point with the specified color.
+        /// </summary>
+        /// <param name="point">Point at which to apply flood fill</param>
+        /// <param name="tile">tile to use for filling</param>
         public void Fill(Point point, Image tile)
         {
             CheckObjectDisposed();
@@ -111,12 +120,24 @@ namespace CodeArt.DotnetGD
             NativeWrappers.gdImageFill(ImagePtr, point.X, point.Y, GdTiled);
         }
 
+        /// <summary>
+        /// Performs a boundary fill by filling an area bounded by a border color
+        /// </summary>
+        /// <param name="point">Point at which to apply the boundary fill</param>
+        /// <param name="color">Color to use for filling</param>
+        /// <param name="border">Border color to use for boundary fill</param>
         public void Fill(Point point, Color color, Color border)
         {
             CheckObjectDisposed();
             NativeWrappers.gdImageFillToBorder(ImagePtr, point.X, point.Y, ResolveColor(border), ResolveColor(color));
         }
 
+        /// <summary>
+        /// Performs a boundary fill by filling an area bounded by a border color
+        /// </summary>
+        /// <param name="point">Point at which to apply the boundary fill</param>
+        /// <param name="tile">Tile to use for filling</param>
+        /// <param name="border">Border color to use for boundary fill</param>
         public void Fill(Point point, Image tile, Color border)
         {
             CheckObjectDisposed();
@@ -573,6 +594,11 @@ namespace CodeArt.DotnetGD
             return res;
         }
 
+        /// <summary>
+        /// Gets the color value to pass to libgd functions to apply a pen
+        /// </summary>
+        /// <param name="pen"></param>
+        /// <returns></returns>
         private int GetPenColor(Pen pen)
         {
             if (pen == null)

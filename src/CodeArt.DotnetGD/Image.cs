@@ -23,17 +23,32 @@ namespace CodeArt.DotnetGD
     /// </summary>
     public sealed unsafe partial class Image : IDisposable
     {
+        /// <summary>
+        /// Static constructor to call Initialize libgd to setup error handling and initialize font cash
+        /// </summary>
         static Image()
         {
             NativeWrappers.InitializeLibGd();
         }
 
+        /// <summary>
+        /// A native pointer to the libgd Image structure.
+        /// </summary>
         internal GdImage* ImagePtr;
-        // when an image is referenced as a brush or a tile for another image  
-        // a reference is incremented to prevent the image from being disposed
+
+        /// <summary>
+        /// when an image is referenced as a brush or a tile for another image  
+        /// a reference is incremented to prevent the image from being disposed
+        /// </summary>
         private int _references = 1;
 
+        /// <summary>
+        /// Palette quantization speed providing best quality when converting a true color image to an 8-bit indexed color format.
+        /// </summary>
         public const int PaletteQuantizationSpeedBestQuality = 1;
+        /// <summary>
+        /// Palette quantization speed providing best speed when converting a true color image to an 8-bit indexed color format.
+        /// </summary>
         public const int PaletteQuantizationSpeedBestSpeed = 10;
         //public const int PaletteQuantizationUgly = 1;
         //public const int PaletteQuantizationPerfect = 100;
@@ -80,7 +95,7 @@ namespace CodeArt.DotnetGD
         }
 
         /// <summary>
-        /// Finalized to clean native resources (in case dispose was not called)
+        /// Finalizer to clean native resources (in case dispose was not called)
         /// </summary>
         ~Image()
         {
@@ -189,6 +204,9 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// The inerpolation method to use when resizing an image.
+        /// </summary>
         public InterpolationMethod InterpolationMethod
         {
             get
@@ -211,7 +229,7 @@ namespace CodeArt.DotnetGD
         public Rectangle Bounds => new Rectangle(new Point(), Size);
 
         /// <summary>
-        /// Gets or sets image's clip rectangle
+        /// Gets or sets image's clip rectangle (drawing outside the boundaries of this rectangle has no effect)
         /// </summary>
         public Rectangle ClipRectangle
         {
@@ -225,24 +243,8 @@ namespace CodeArt.DotnetGD
             set
             {
                 CheckObjectDisposed();
-                if (value.Left < 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, $"{nameof(ClipRectangle)}.{nameof(ClipRectangle.Left)} must be greater than or equal zero.");
-                if (value.Top < 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, $"{nameof(ClipRectangle)}.{nameof(ClipRectangle.Top)} must be greater than or equal zero.");
-                if (value.Left >= Width)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, $"{nameof(ClipRectangle)}.{nameof(ClipRectangle.Left)} must be less than {nameof(Width)} which is {Width}.");
-                if (value.Top >= Height)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, $"{nameof(ClipRectangle)}.{nameof(ClipRectangle.Top)} must be less than {nameof(Height)} which is {Height}.");
-
-                if (value.Right < 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, $"{nameof(ClipRectangle)}.{nameof(ClipRectangle.Right)} must be greater than or equal zero.");
-                if (value.Bottom < 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, $"{nameof(ClipRectangle)}.{nameof(ClipRectangle.Bottom)} must be greater than or equal zero.");
-                if (value.Right >= Width)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, $"{nameof(ClipRectangle)}.{nameof(ClipRectangle.Right)} must be less than {nameof(Width)} which is {Width}.");
-                if (value.Bottom >= Height)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, $"{nameof(ClipRectangle)}.{nameof(ClipRectangle.Bottom)} must be less than {nameof(Height)} which is {Height}.");
-
+                if (!Bounds.Contains(value))
+                    throw new ArgumentException("Clip rectangle cannot be outside the image boundaries.", nameof(value));
                 NativeWrappers.gdImageSetClip(ImagePtr, value.Left, value.Top, value.Right, value.Bottom);
             }
         }

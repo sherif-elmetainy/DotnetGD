@@ -3,9 +3,18 @@
 
 namespace CodeArt.DotnetGD
 {
+    /// <summary>
+    /// Matrix trasformation order
+    /// </summary>
     public enum MatrixOrder
     {
+        /// <summary>
+        /// transformation applied before the existing transformation
+        /// </summary>
         Prepend,
+        /// <summary>
+        /// transformation applied after the existing transformation
+        /// </summary>
         Append
     }
 }

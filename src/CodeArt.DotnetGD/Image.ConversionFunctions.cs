@@ -20,7 +20,7 @@ namespace CodeArt.DotnetGD
         }
 
         /// <summary>
-        /// Changes the format of an image. 
+        /// Changes the format of an image. This is an in place replacement. No new image is created.
         /// </summary>
         /// <param name="newPixelFormat">The new image format. If the image format is the same, the method does nothing.</param>
         /// <param name="quantizationMethod">Quantization method to use when converting from truecolor to 8-bit. This is ignored when converting to true color.</param>
@@ -80,7 +80,7 @@ namespace CodeArt.DotnetGD
         }
 
         /// <summary>
-        /// creates a new image based on the image with a new format.
+        /// Creates a new image based on the image with a new format.
         /// </summary>
         /// <param name="newPixelFormat">The new image format. If the image format is the same, the method is the same as <see cref="Clone"/>.</param>
         /// <param name="quantizationMethod">Quantization method to use when converting from truecolor to 8-bit. This is ignored when converting to true color.</param>

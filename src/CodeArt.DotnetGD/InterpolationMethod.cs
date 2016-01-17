@@ -3,6 +3,9 @@
 
 namespace CodeArt.DotnetGD
 {
+    /// <summary>
+    /// Interpolation method used for resizing images
+    /// </summary>
     public enum InterpolationMethod
     {
         Default = 0,

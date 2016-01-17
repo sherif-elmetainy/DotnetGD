@@ -9,7 +9,7 @@ namespace CodeArt.DotnetGD
     public unsafe partial class Image
     {
         /// <summary>
-        /// Pixelate the imae
+        /// Pixelate the image
         /// </summary>
         /// <param name="blockSize">block size for pixels</param>
         /// <param name="mode">pixelate mode</param>
@@ -102,36 +102,57 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// Smoothes the image (noise removal)
+        /// </summary>
+        /// <param name="weight"></param>
         public void Smooth(float weight)
         {
             CheckObjectDisposed();
             NativeWrappers.gdImageSmooth(ImagePtr, weight);
         }
 
+        /// <summary>
+        /// Deblurs the image https://xjaphx.wordpress.com/2011/06/22/image-processing-mean-removal-effect/
+        /// </summary>
         public void MeanRemoval()
         {
             CheckObjectDisposed();
             NativeWrappers.gdImageMeanRemoval(ImagePtr);
         }
 
+        /// <summary>
+        /// Each pixel of an image is replaced either by a highlight or a shadow, depending on light/dark boundaries on the original image.
+        /// https://en.wikipedia.org/wiki/Image_embossing
+        /// </summary>
         public void Emboss()
         {
             CheckObjectDisposed();
             NativeWrappers.gdImageEmboss(ImagePtr);
         }
 
+        /// <summary>
+        /// Perform gaussian blur (https://en.wikipedia.org/wiki/Gaussian_blur)
+        /// </summary>
         public void GaussianBlur()
         {
             CheckObjectDisposed();
             NativeWrappers.gdImageGaussianBlur(ImagePtr);
         }
 
+        /// <summary>
+        /// Detect points at which image brighness changes sharply. 
+        /// https://en.wikipedia.org/wiki/Edge_detection
+        /// </summary>
         public void EdgeDetect()
         {
             CheckObjectDisposed();
             NativeWrappers.gdImageEdgeDetectQuick(ImagePtr);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void SelectiveBlur()
         {
             CheckObjectDisposed();
@@ -144,12 +165,21 @@ namespace CodeArt.DotnetGD
             NativeWrappers.gdImageGrayScale(ImagePtr);
         }
 
+        /// <summary>
+        /// Negate the image
+        /// </summary>
         public void Negate()
         {
             CheckObjectDisposed();
             NativeWrappers.gdImageNegate(ImagePtr);
         }
 
+        /// <summary>
+        /// https://en.wikipedia.org/wiki/Kernel_(image_processing)#Convolution
+        /// </summary>
+        /// <param name="filter">convolution matrix</param>
+        /// <param name="filterDiv"></param>
+        /// <param name="offset"></param>
         public void Convolution(float[,] filter, float filterDiv, float offset)
         {
             if (filter == null)
@@ -164,12 +194,22 @@ namespace CodeArt.DotnetGD
             }
         }
 
+        /// <summary>
+        /// Sets the contrast of an image
+        /// </summary>
+        /// <param name="contrast">0 for lowest contract, 100 for highest contrast. Valid values are from 0 inclusive to 100 inclusive.</param>
         public void Contrast(double contrast)
         {
+            if (contrast < 0.0d || contrast > 100.0d)
+                throw new ArgumentOutOfRangeException(nameof(contrast), contrast, "Constrat must be from 0 to 100.");
             CheckObjectDisposed();
             NativeWrappers.gdImageContrast(ImagePtr, contrast);
         }
 
+        /// <summary>
+        /// Set brighness of the image.
+        /// </summary>
+        /// <param name="brightness">brightness value. Zero keeps the image unchanged, negative values darkens the image, positive values increase the brightness. Valid values are from -255 inclusive to 255 inclusive.</param>
         public void Brightness(int brightness)
         {
             if (brightness < -255 || brightness > 255)
@@ -178,6 +218,12 @@ namespace CodeArt.DotnetGD
             NativeWrappers.gdImageBrightness(ImagePtr, brightness);
         }
 
+        /// <summary>
+        /// Create a *new* copy of an image by applying guassian blur https://en.wikipedia.org/wiki/Gaussian_blur
+        /// </summary>
+        /// <param name="radius">radius of the gaussian blur</param>
+        /// <param name="sigma">he standard deviation of the Gaussian distribution</param>
+        /// <returns></returns>
         public Image CopyGaussianBlurred(int radius, double sigma)
         {
             if (radius < 1) throw new ArgumentOutOfRangeException(nameof(radius), radius, "Radius must be positive.");
@@ -186,24 +232,38 @@ namespace CodeArt.DotnetGD
             return new Image(result);
         }
 
+        /// <summary>
+        /// Flip the image horizontally
+        /// </summary>
         public void FlipHorizontal()
         {
             CheckObjectDisposed();
             NativeWrappers.gdImageFlipHorizontal(ImagePtr);
         }
 
+        /// <summary>
+        /// Flip the image vertically
+        /// </summary>
         public void FlipVertical()
         {
             CheckObjectDisposed();
             NativeWrappers.gdImageFlipVertical(ImagePtr);
         }
 
+        /// <summary>
+        /// Flip the image vertically and horizontally
+        /// </summary>
         public void FlipBoth()
         {
             CheckObjectDisposed();
             NativeWrappers.gdImageFlipBoth(ImagePtr);
         }
 
+        /// <summary>
+        /// Creates a *new* image by cropping the source image using the speficied rectangle an returns a *new* cropped image. The source image is not modified.
+        /// </summary>
+        /// <param name="cropRectangle">crop rectangle</param>
+        /// <returns>the newly created image</returns>
         public Image Crop(Rectangle cropRectangle)
         {
             CheckObjectDisposed();
@@ -212,14 +272,25 @@ namespace CodeArt.DotnetGD
             return new Image(NativeWrappers.gdImageCrop(ImagePtr, &cropRectangle));
         }
 
+        /// <summary>
+        /// Creates a *new* image by cropping the source image using a specified crop mode and returns a *new* Image. The source image is not modified.
+        /// </summary>
+        /// <param name="mode"><see cref="CropMode"/> to use</param>
+        /// <returns>A new cropped image.</returns>
         public Image Crop(CropMode mode)
         {
             CheckObjectDisposed();
-            if (mode < CropMode.Default || mode > CropMode.Threshold)
+            if (mode < CropMode.Default || mode > CropMode.Sides)
                 throw new ArgumentOutOfRangeException(nameof(mode), mode, "Invalid crop mode.");
             return new Image(NativeWrappers.gdImageCropAuto(ImagePtr, mode));
         }
 
+        /// <summary>
+        /// Creates a *new* image by cropping the source image using a specified corner color. The source image is not modified.
+        /// </summary>
+        /// <param name="color">the corner color to use for cropping, pixels are cropped as long as they match the color or their distance is within the threshold.</param>
+        /// <param name="threshold">Threshold to use to determine if the color matches the corner color specified. A threshold of zero means exact match. The threshold is the distance between the two colors in HSL color space.</param>
+        /// <returns>A new cropped image.</returns>
         public Image Crop(Color color, float threshold)
         {
             CheckObjectDisposed();
@@ -227,6 +298,12 @@ namespace CodeArt.DotnetGD
             return new Image(NativeWrappers.gdImageCropThreshold(ImagePtr, c, threshold));
         }
 
+        /// <summary>
+        /// Creates a *new* image by cropping the source image using a specified corner color. The source image is not modified.
+        /// </summary>
+        /// <param name="newSize">size of the new image.</param>
+        /// <param name="method">The interpolation method to use.</param>
+        /// <returns>A new cropped image.</returns>
         public Image Resize(Size newSize, InterpolationMethod method = InterpolationMethod.Default)
         {
             if (newSize == Size)
@@ -241,6 +318,13 @@ namespace CodeArt.DotnetGD
             return new Image(NativeWrappers.gdImageScale(ImagePtr, (uint)newSize.Width, (uint)newSize.Height));
         }
 
+        /// <summary>
+        /// Create a *new* image by rotating the source image. The source image is not modified.
+        /// </summary>
+        /// <param name="angle">rotation angle anti-clockwise in degrees.</param>
+        /// <param name="bgColor">background color of the new image</param>
+        /// <param name="method">interpolation method to use</param>
+        /// <returns>A new rotated image.</returns>
         public Image Rotate(float angle, Color bgColor, InterpolationMethod method = InterpolationMethod.Default)
         {
             if (method < InterpolationMethod.Default || method >= InterpolationMethod.Invalid)
