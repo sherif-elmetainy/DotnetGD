@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Sherif Elmetainy (Code Art). 
 // Licensed under the MIT License, See License.txt in the repository root for license information.
 
-/*
-* Bidi reference implementation from http://www.unicode.org/Public/PROGRAMS/BidiReferenceJava/
-* Original Code ported from java to C# by Sherif Elmetainy
-* The credits and copyright info for the original code listed below
-*/
+
+// Bidi reference implementation from http://www.unicode.org/Public/PROGRAMS/BidiReferenceJava/
+// Original Code ported from java to C# by Sherif Elmetainy
+// The credits and copyright info for the original code listed below
+
 /*
 * Last Revised: 2013-09-02
 *
@@ -42,60 +42,52 @@ using static CodeArt.Bidi.BidiDirection;
 
 namespace CodeArt.Bidi
 {
-    
-
-
-    /**
-     * Reference implementation of the Unicode Bidirectional Algorithm (UAX #9).
-     *
-     * <p>
-     * This implementation is not optimized for performance. It is intended as a
-     * reference implementation that closely follows the specification of the
-     * Bidirectional Algorithm in The Unicode Standard version 6.3.
-     * <p>
-     * <b>Input:</b><br>
-     * There are two levels of input to the algorithm, since clients may prefer to
-     * supply some information from out-of-band sources rather than relying on the
-     * default behavior.
-     * <ol>
-     * <li>Bidi class array
-     * <li>Bidi class array, with externally supplied base line direction
-     * </ol>
-     * <p>
-     * <b>Output:</b><br>
-     * Output is separated into several stages as well, to better enable clients to
-     * evaluate various aspects of implementation conformance.
-     * <ol>
-     * <li>levels array over entire paragraph
-     * <li>reordering array over entire paragraph
-     * <li>levels array over line
-     * <li>reordering array over line
-     * </ol>
-     * Note that for conformance to the Unicode Bidirectional Algorithm,
-     * implementations are only required to generate correct reordering and
-     * character directionality (odd or even levels) over a line. Generating
-     * identical level arrays over a line is not required. Bidi explicit format
-     * codes (LRE, RLE, LRO, RLO, PDF) and BN can be assigned arbitrary levels and
-     * positions as long as the rest of the input is properly reordered.
-     * <p>
-     * As the algorithm is defined to operate on a single paragraph at a time, this
-     * implementation is written to handle single paragraphs. Thus rule P1 is
-     * presumed by this implementation-- the data provided to the implementation is
-     * assumed to be a single paragraph, and either contains no 'B' codes, or a
-     * single 'B' code at the end of the input. 'B' is allowed as input to
-     * illustrate how the algorithm assigns it a level.
-     * <p>
-     * Also note that rules L3 and L4 depend on the rendering engine that uses the
-     * result of the bidi algorithm. This implementation assumes that the rendering
-     * engine expects combining marks in visual order (e.g. to the left of their
-     * base character in RTL runs) and that it adjusts the glyphs used to render
-     * mirrored characters that are in RTL runs so that they render appropriately.
-     *
-     * @author Doug Felt
-     * @author Roozbeh Pournader
-     * @author Asmus Freytag
-     */
-
+    /// <summary>
+    /// Reference implementation of the Unicode Bidirectional Algorithm(UAX #9).
+    /// 
+    /// This implementation is not optimized for performance.It is intended as a
+    /// reference implementation that closely follows the specification of the
+    /// Bidirectional Algorithm in The Unicode Standard version 6.3.
+    /// 
+    /// <b>Input:</b>
+    /// There are two levels of input to the algorithm, since clients may prefer to
+    /// supply some information from out-of-band sources rather than relying on the
+    /// default behavior.
+    /// 
+    /// - Bidi class array
+    /// - Bidi class array, with externally supplied base line direction
+    /// 
+    /// Output:
+    /// Output is separated into several stages as well, to better enable clients to
+    /// evaluate various aspects of implementation conformance.
+    /// 
+    /// - levels array over entire paragraph
+    /// - reordering array over entire paragraph
+    /// - levels array over line
+    /// - reordering array over line
+    /// 
+    /// Note that for conformance to the Unicode Bidirectional Algorithm,
+    /// implementations are only required to generate correct reordering and
+    /// character directionality(odd or even levels) over a line.Generating
+    /// identical level arrays over a line is not required.Bidi explicit format
+    /// codes (LRE, RLE, LRO, RLO, PDF) and BN can be assigned arbitrary levels and
+    /// positions as long as the rest of the input is properly reordered.
+    /// 
+    /// As the algorithm is defined to operate on a single paragraph at a time, this
+    /// implementation is written to handle single paragraphs.Thus rule P1 is
+    /// presumed by this implementation-- the data provided to the implementation is
+    /// assumed to be a single paragraph, and either contains no 'B' codes, or a
+    /// single 'B' code at the end of the input. 'B' is allowed as input to
+    /// illustrate how the algorithm assigns it a level.
+    /// 
+    /// Also note that rules L3 and L4 depend on the rendering engine that uses the
+    /// result of the bidi algorithm. This implementation assumes that the rendering
+    /// engine expects combining marks in visual order (e.g.to the left of their
+    /// base character in RTL runs) and that it adjusts the glyphs used to render
+    /// mirrored characters that are in RTL runs so that they render appropriately.
+    ///
+    /// Authors of Java version: Doug Felt, Roozbeh Pournader, Asmus Freytag
+    /// </summary>
     public class BidiReference
     {
         private readonly BidiDirection[] _initialTypes;
@@ -107,26 +99,32 @@ namespace CodeArt.Bidi
 
         public BidiDirection[] GetResultTypes() => _resultTypes.ToArray(); // for display in test mode
 
-        /*
-         * Index of matching PDI for isolate initiator characters. For other
-         * characters, the value of _matchingPDI will be set to -1. For isolate
-         * initiators with no matching PDI, _matchingPDI will be set to the length of
-         * the input string.
-         */
+        /// <summary>
+        /// Index of matching PDI for isolate initiator characters. For other
+        /// characters, the value of _matchingPDI will be set to -1. For isolate
+        /// initiators with no matching PDI, _matchingPDI will be set to the length of
+        /// the input string.
+        ///</summary>
         private int[] _matchingPDI;
 
-        /*
-         * Index of matching isolate initiator for PDI characters. For other
-         * characters, and for PDIs with no matching isolate initiator, the value of
-         * _matchingIsolateInitiator will be set to -1.
-         */
+        /// <summary>
+        /// Index of matching isolate initiator for PDI characters. For other
+        /// characters, and for PDIs with no matching isolate initiator, the value of
+        /// _matchingIsolateInitiator will be set to -1.
+        /// </summary>
         private int[] _matchingIsolateInitiator;
 
-        /*
-         * Arrays of properties needed for paired bracket evaluation in N0
-         */
-        private readonly BracketType[] _pairTypes; // paired Bracket types for paragraph
-        private readonly int[] _pairValues; // paired Bracket values for paragraph
+        // Arrays of properties needed for paired bracket evaluation in N0
+
+        /// <summary>
+        /// paired Bracket types for paragraph
+        /// </summary>
+        private readonly BracketType[] _pairTypes;
+
+        /// <summary>
+        /// paired Bracket values for paragraph
+        /// </summary>
+        private readonly int[] _pairValues;
 
         public BidiPBAReference PBA { get; set; }
 
@@ -134,20 +132,20 @@ namespace CodeArt.Bidi
         // Input
         //
 
-        /**
-         * Initialize using several arrays, then run the algorithm
-         * @param types
-         *            Array of types ranging from TypeMin to TypeMax inclusive 
-         *            and representing the direction codes of the characters in the text.
-         * @param _pairTypes
-         * 			  Array of paired bracket types ranging from 0 (none) to 2 (closing)
-         * 			  of the characters
-         * @param _pairValues
-         * 			  Array identifying which set of matching bracket characters
-         * 			  as defined in BidiPBAReference (note, both opening and closing
-         * 			  bracket get the same value if they are part of the same canonical "set"
-         * 			  or pair)
-         */
+        /// <summary>
+        /// Initialize using several arrays, then run the algorithm
+        /// </summary>
+        /// <param name="types"> Array of types ranging from TypeMin to TypeMax inclusive
+        /// and representing the direction codes of the characters in the text.
+        /// </param>
+        /// <param name="pairTypes">Array of paired bracket types ranging from 0 (none) to 2 (closing)
+        ///  of the characters
+        /// </param>
+        /// <param name="pairValues"> Array identifying which set of matching bracket characters
+        /// as defined in BidiPBAReference(note, both opening and closing
+        /// bracket get the same value if they are part of the same canonical "set"
+        /// or pair)
+        /// </param>
         public BidiReference(BidiDirection[] types, BracketType[] pairTypes, int[] pairValues)
         {
             ValidateTypes(types);
@@ -161,22 +159,17 @@ namespace CodeArt.Bidi
             RunAlgorithm();
         }
 
-        /**
-         * Initialize using several arrays of direction and other types and an externally supplied
-         * paragraph embedding level. The embedding level may be  0, 1 or 2.
-         * <p>
-         * 2 means to apply the default algorithm (rules P2 and P3), 0 is for LTR
-         * paragraphs, and 1 is for RTL paragraphs.
-         *
-         * @param types
-         *            the types array
-         * @param _pairTypes
-         *           the paired bracket types array
-         * @param _pairValues
-         * 			 the paired bracket values array
-         * @param _paragraphEmbeddingLevel
-         *            the externally supplied paragraph embedding level.
-         */
+        /// <summary>
+        ///  Initialize using several arrays of direction and other types and an externally supplied
+        /// paragraph embedding level.The embedding level may be  0, 1 or 2.
+        /// 
+        /// 2 means to apply the default algorithm (rules P2 and P3), 0 is for LTR
+        /// paragraphs, and 1 is for RTL paragraphs.
+        /// </summary>
+        /// <param name="types">the types array</param>
+        /// <param name="pairTypes">the paired bracket types array</param>
+        /// <param name="pairValues">the paired bracket values array</param>
+        /// <param name="paragraphEmbeddingLevel">the externally supplied paragraph embedding level.</param>
         public BidiReference(BidiDirection[] types, BracketType[] pairTypes, int[] pairValues, ParagraphDirection paragraphEmbeddingLevel)
         {
             ValidateTypes(types);
@@ -192,12 +185,12 @@ namespace CodeArt.Bidi
             RunAlgorithm();
         }
 
-        
 
-        /**
-         * The algorithm. Does not include line-based processing (Rules L1, L2).
-         * These are applied later in the line-based phase of the algorithm.
-         */
+
+        /// <summary>
+        /// The algorithm. Does not include line-based processing (Rules L1, L2).
+        /// These are applied later in the line-based phase of the algorithm.
+        ///</summary>
         private void RunAlgorithm()
         {
             _textLength = _initialTypes.Length;
@@ -266,23 +259,22 @@ namespace CodeArt.Bidi
             AssignLevelsToCharactersRemovedByX9();
         }
 
-        /**
-         * Determine the matching PDI for each isolate initiator and vice versa.
-         * <p>
-         * Definition BD9.
-         * <p>
-         * At the end of this function:
-         * <ul>
-         * <li>The member variable _matchingPDI is set to point to the index of the
-         * matching PDI character for each isolate initiator character. If there is
-         * no matching PDI, it is set to the length of the input text. For other
-         * characters, it is set to -1.
-         * <li>The member variable _matchingIsolateInitiator is set to point to the
-         * index of the matching isolate initiator character for each PDI character.
-         * If there is no matching isolate initiator, or the character is not a PDI,
-         * it is set to -1.
-         * </ul>
-         */
+        /// <summary>
+        /// Determine the matching PDI for each isolate initiator and vice versa.
+        /// 
+        /// Definition BD9.
+        /// 
+        /// At the end of this function:
+        /// 
+        /// - The member variable _matchingPDI is set to point to the index of the
+        /// matching PDI character for each isolate initiator character. If there is
+        /// no matching PDI, it is set to the length of the input text. For other
+        /// characters, it is set to -1.
+        /// - The member variable _matchingIsolateInitiator is set to point to the
+        /// index of the matching isolate initiator character for each PDI character.
+        /// If there is no matching isolate initiator, or the character is not a PDI,
+        /// it is set to -1.
+        /// </summary>
         private void DetermineMatchingIsolates()
         {
             _matchingPDI = new int[_textLength];
@@ -327,18 +319,13 @@ namespace CodeArt.Bidi
             }
         }
 
-        /**
-         * Determines the paragraph level based on rules P2, P3. This is also used
-         * in rule X5c to find if an FSI should resolve to LRI or RLI.
-         *
-         * @param startIndex
-         *            the index of the beginning of the substring
-         * @param endIndex
-         *            the index of the character after the end of the string
-         *
-         * @return the resolved paragraph direction of the substring limited by
-         *         startIndex and endIndex
-         */
+        /// <summary>
+        /// Determines the paragraph level based on rules P2, P3. This is also used
+        /// in rule X5c to find if an FSI should resolve to LRI or RLI.
+        /// </summary>
+        /// <param name="startIndex">the index of the beginning of the substring</param>
+        /// <param name="endIndex">the index of the character after the end of the string</param>
+        /// <returns>the resolved paragraph direction of the substring limited by startIndex and endIndex</returns>
         private ParagraphDirection DetermineParagraphEmbeddingLevel(int startIndex, int endIndex)
         {
             var strongType = Unknown; // unknown
@@ -375,8 +362,10 @@ namespace CodeArt.Bidi
 
         public const int MaxDepth = 125;
 
-        // This stack will store the embedding levels and override and isolated
-        // statuses
+        /// <summary>
+        /// This stack will store the embedding levels and override and isolated
+        /// statuses
+        /// </summary>
         private class DirectionalStatusStack
         {
             private int _stackCounter;
@@ -423,9 +412,9 @@ namespace CodeArt.Bidi
             }
         }
 
-        /**
-         * Determine explicit levels using rules X1 - X8
-         */
+        /// <summary>
+        /// Determine explicit levels using rules X1 - X8
+        /// </summary>
         private void DetermineExplicitEmbeddingLevels()
         {
             var stack = new DirectionalStatusStack();
@@ -441,6 +430,7 @@ namespace CodeArt.Bidi
                 var t = _resultTypes[i];
 
                 // Rules X2, X3, X4, X5, X5a, X5b, X5c
+                // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (t)
                 {
                     case RLE:
@@ -581,21 +571,35 @@ namespace CodeArt.Bidi
 
         private class IsolatingRunSequence
         {
-            private readonly int[] _indexes; // indexes to the original string
+            /// <summary>
+            /// indexes to the original string
+            /// </summary>
+            private readonly int[] _indexes;
             private readonly BidiReference _bidiReference;
-            private readonly BidiDirection[] _types; // type of each character using the index
-            private sbyte[] _resolvedLevels; // resolved levels after application of
-                                            // rules
-            private readonly int _length; // length of isolating run sequence in
-                                         // characters
+
+            /// <summary>
+            /// type of each character using the index
+            /// </summary>
+            private readonly BidiDirection[] _types;
+
+            /// <summary>
+            /// resolved levels after application of rules
+            /// </summary>
+            private sbyte[] _resolvedLevels;
+
+            /// <summary>
+            /// length of isolating run sequence in characters
+            /// </summary>
+            private readonly int _length;
             private readonly sbyte _level;
             private readonly BidiDirection _sos, _eos;
 
-            /**
-             * Rule X10, second bullet: Determine the start-of-sequence (sos) and end-of-sequence (eos) types,
-             * 			 either L or R, for each isolating run sequence.
-             * @param inputIndexes
-             */
+            /// <summary>
+            /// Rule X10, second bullet: Determine the start-of-sequence(sos) and end-of-sequence(eos) types,
+            /// either L or R, for each isolating run sequence.
+            /// </summary>
+            /// <param name="inputIndexes"></param>
+            /// <param name="bidiReference"></param>
             public IsolatingRunSequence(int[] inputIndexes, BidiReference bidiReference)
             {
                 _indexes = inputIndexes;
@@ -628,8 +632,8 @@ namespace CodeArt.Bidi
                 else
                 {
                     var limit = _indexes[_length - 1] + 1; // the first character
-                                                         // after the end of
-                                                         // run sequence
+                                                           // after the end of
+                                                           // run sequence
                     while (limit < _bidiReference._textLength && IsRemovedByX9(_bidiReference._initialTypes[limit]))
                     {
                         ++limit;
@@ -639,10 +643,9 @@ namespace CodeArt.Bidi
                 _eos = TypeForLevel(Math.Max(succLevel, _level));
             }
 
-            /**
-             * Resolving bidi paired brackets  Rule N0
-             */
-
+            /// <summary>
+            /// Resolving bidi paired brackets  Rule N0
+            /// </summary>
             public void ResolvePairedBrackets()
             {
                 _bidiReference.PBA = new BidiPBAReference();
@@ -650,12 +653,12 @@ namespace CodeArt.Bidi
             }
 
 
-            /**
-             * Resolving weak types Rules W1-W7.
-             *
-             * Note that some weak types (EN, AN) remain after this processing is
-             * complete.
-             */
+            /// <summary>
+            /// Resolving weak types Rules W1-W7.
+            ///
+            /// Note that some weak types (EN, AN) remain after this processing is
+            /// complete.
+            ///</summary>
             public void ResolveWeakTypes()
             {
 
@@ -741,6 +744,7 @@ namespace CodeArt.Bidi
                 // Rule W5.
                 for (var i = 0; i < _length; ++i)
                 {
+                    // ReSharper disable once InvertIf
                     if (_types[i] == ET)
                     {
                         // locate end of sequence
@@ -778,6 +782,7 @@ namespace CodeArt.Bidi
                 // Rule W7.
                 for (var i = 0; i < _length; ++i)
                 {
+                    // ReSharper disable once InvertIf
                     if (_types[i] == EN)
                     {
                         // set default if we reach start of run
@@ -799,9 +804,9 @@ namespace CodeArt.Bidi
                 }
             }
 
-            /**
-             * 6) resolving neutral types Rules N1-N2.
-             */
+            /// <summary>
+            /// 6) resolving neutral types Rules N1-N2.
+            /// </summary>
             public void ResolveNeutralTypes()
             {
 
@@ -811,6 +816,7 @@ namespace CodeArt.Bidi
                 for (var i = 0; i < _length; ++i)
                 {
                     var t = _types[i];
+                    // ReSharper disable once InvertIf
                     if (t == WS || t == ON || t == B || t == S || t == RLI || t == LRI || t == FSI || t == PDI)
                     {
                         // find bounds of run of neutrals
@@ -872,9 +878,9 @@ namespace CodeArt.Bidi
                 }
             }
 
-            /**
-             * 7) resolving implicit embedding levels Rules I1, I2.
-             */
+            /// <summary>
+            /// 7) resolving implicit embedding levels Rules I1, I2.
+            /// </summary>
             public void ResolveImplicitLevels()
             {
 
@@ -922,10 +928,9 @@ namespace CodeArt.Bidi
                 }
             }
 
-            /*
-             * Applies the levels and types resolved in rules W1-I2 to the
-             * _resultLevels array.
-             */
+            /// <summary>
+            /// Applies the levels and types resolved in rules W1-I2 to the _resultLevels array.
+            /// </summary>
             public void ApplyLevelsAndTypes()
             {
                 for (var i = 0; i < _length; ++i)
@@ -936,11 +941,15 @@ namespace CodeArt.Bidi
                 }
             }
 
-            /**
-             * Return the limit of the run consisting only of the types in validSet
-             * starting at index. This checks the value at index, and will return
-             * index if that value is not in validSet.
-             */
+            /// <summary>
+            /// Return the limit of the run consisting only of the types in validSet
+            ///  starting at index. This checks the value at index, and will return
+            /// index if that value is not in validSet.
+            /// </summary>
+            /// <param name="index"></param>
+            /// <param name="limit"></param>
+            /// <param name="validSet"></param>
+            /// <returns></returns>
             // ReSharper disable once SuggestBaseTypeForParameter
             private int FindRunLimit(int index, int limit, BidiDirection[] validSet)
             {
@@ -968,9 +977,12 @@ namespace CodeArt.Bidi
                 return limit;
             }
 
-            /**
-             * Set types from start up to (but not including) limit to newType.
-             */
+            /// <summary>
+            ///  Set types from start up to (but not including) limit to newType.
+            /// </summary>
+            /// <param name="start"></param>
+            /// <param name="limit"></param>
+            /// <param name="newType"></param>
             private void SetTypes(int start, int limit, BidiDirection newType)
             {
                 for (var i = start; i < limit; ++i)
@@ -979,10 +991,11 @@ namespace CodeArt.Bidi
                 }
             }
 
-            /**
-             * Algorithm validation. Assert that all values in types are in the
-             * provided set.
-             */
+            /// <summary>
+            /// Algorithm validation. Assert that all values in types are in the provided set.
+            /// </summary>
+            /// <param name="codes"></param>
+            // ReSharper disable once SuggestBaseTypeForParameter
             private void AssertOnly(BidiDirection[] codes)
             {
                 for (var i = 0; i < _length; ++i)
@@ -1008,14 +1021,12 @@ namespace CodeArt.Bidi
             }
         }
 
-        /**
-         * Determines the level runs. Rule X9 will be applied in determining the
-         * runs, in the way that makes sure the characters that are supposed to be
-         * removed are not included in the runs.
-         *
-         * @return an array of level runs. Each level run is described as an array
-         *         of indexes into the input string.
-         */
+        /// <summary>
+        /// Determines the level runs.Rule X9 will be applied in determining the
+        /// runs, in the way that makes sure the characters that are supposed to be
+        /// removed are not included in the runs.
+        /// </summary>
+        /// <returns>an array of level runs. Each level run is described as an array of indexes into the input string.</returns>
         private int[][] DetermineLevelRuns()
         {
             // temporary array to hold the run
@@ -1028,6 +1039,7 @@ namespace CodeArt.Bidi
             var runLength = 0;
             for (var i = 0; i < _textLength; ++i)
             {
+                // ReSharper disable once InvertIf
                 if (!IsRemovedByX9(_initialTypes[i]))
                 {
                     if (_resultLevels[i] != currentLevel)
@@ -1049,6 +1061,7 @@ namespace CodeArt.Bidi
                 }
             }
             // Wrap up the final run, if any
+            // ReSharper disable once InvertIf
             if (runLength != 0)
             {
                 var run = temporaryRun.ArrayCopyOf(runLength);
@@ -1059,11 +1072,10 @@ namespace CodeArt.Bidi
             return allRuns.ArrayCopyOf(numRuns);
         }
 
-        /**
-         * Definition BD13. Determine isolating run sequences.
-         *
-         * @return an array of isolating run sequences.
-         */
+        /// <summary>
+        ///Definition BD13.Determine isolating run sequences.
+        /// </summary>
+        /// <returns>an array of isolating run sequences.</returns>
         private IsolatingRunSequence[] DetermineIsolatingRunSequences()
         {
             var levelRuns = DetermineLevelRuns();
@@ -1116,17 +1128,12 @@ namespace CodeArt.Bidi
             return sequences.ArrayCopyOf(numSequences);
         }
 
-        /**
-         * Assign level information to characters removed by rule X9. This is for
-         * ease of relating the level information to the original input data. Note
-         * that the levels assigned to these codes are arbitrary, they're chosen so
-         * as to avoid breaking level runs.
-         *
-         * @param _textLength
-         *            the length of the data after compression
-         * @return the length of the data (original length of types array supplied
-         *         to constructor)
-         */
+        /// <summary>
+        /// Assign level information to characters removed by rule X9.This is for
+        /// ease of relating the level information to the original input data.Note
+        /// that the levels assigned to these codes are arbitrary, they're chosen so
+        /// as to avoid breaking level runs.
+        /// </summary>
         private void AssignLevelsToCharactersRemovedByX9()
         {
             for (var i = 0; i < _initialTypes.Length; ++i)
@@ -1164,21 +1171,19 @@ namespace CodeArt.Bidi
         // Output
         //
 
-        /**
-         * Return levels array breaking lines at offsets in linebreaks. <br>
-         * Rule L1.
-         * <p>
-         * The returned levels array contains the resolved level for each bidi code
-         * passed to the constructor.
-         * <p>
-         * The linebreaks array must include at least one value. The values must be
-         * in strictly increasing order (no duplicates) between 1 and the length of
-         * the text, inclusive. The last value must be the length of the text.
-         *
-         * @param linebreaks
-         *            the offsets at which to break the paragraph
-         * @return the resolved levels of the text
-         */
+        /// <summary>
+        /// Return levels array breaking lines at offsets in linebreaks. 
+        /// Rule L1.
+        /// 
+        /// The returned levels array contains the resolved level for each bidi code
+        /// passed to the constructor.
+        /// >
+        /// The linebreaks array must include at least one value.The values must be
+        /// in strictly increasing order (no duplicates) between 1 and the length of
+        /// the text, inclusive. The last value must be the length of the text.
+        /// </summary>
+        /// <param name="linebreaks">the offsets at which to break the paragraph</param>
+        /// <returns>the resolved levels of the text</returns>
         public sbyte[] GetLevels(int[] linebreaks)
         {
 
@@ -1196,7 +1201,7 @@ namespace CodeArt.Bidi
             ValidateLineBreaks(linebreaks, _textLength);
 
             var result = _resultLevels.ToArray(); // will be returned to
-                                                     // caller
+                                                  // caller
 
             // don't worry about linebreaks since if there is a break within
             // a series of WS values preceding S, the linebreak itself
@@ -1204,6 +1209,7 @@ namespace CodeArt.Bidi
             for (var i = 0; i < result.Length; ++i)
             {
                 var t = _initialTypes[i];
+                // ReSharper disable once InvertIf
                 if (t == B || t == S)
                 {
                     // Rule L1, clauses one and two.
@@ -1249,28 +1255,27 @@ namespace CodeArt.Bidi
             return result;
         }
 
-        /**
-         * Return reordering array breaking lines at offsets in linebreaks.
-         * <p>
-         * The reordering array maps from a visual index to a logical index. Lines
-         * are concatenated from left to right. So for example, the fifth character
-         * from the left on the third line is
-         *
-         * <pre>
-         * getReordering(linebreaks)[linebreaks[1] + 4]
-         * </pre>
-         *
-         * (linebreaks[1] is the position after the last character of the second
-         * line, which is also the index of the first character on the third line,
-         * and adding four gets the fifth character from the left).
-         * <p>
-         * The linebreaks array must include at least one value. The values must be
-         * in strictly increasing order (no duplicates) between 1 and the length of
-         * the text, inclusive. The last value must be the length of the text.
-         *
-         * @param linebreaks
-         *            the offsets at which to break the paragraph.
-         */
+        /// <summary>
+        /// Return reordering array breaking lines at offsets in linebreaks.
+        /// 
+        /// The reordering array maps from a visual index to a logical index.Lines
+        /// are concatenated from left to right. So for example, the fifth character
+        /// from the left on the third line is
+        ///
+        /// <pre>
+        /// getReordering(linebreaks)[linebreaks[1] + 4]
+        /// </pre>
+        ///
+        /// (linebreaks[1] is the position after the last character of the second
+        /// line, which is also the index of the first character on the third line,
+        /// and adding four gets the fifth character from the left).
+        /// 
+        /// The linebreaks array must include at least one value.The values must be
+        /// in strictly increasing order(no duplicates) between 1 and the length of
+        /// the text, inclusive. The last value must be the length of the text.
+        /// </summary>
+        /// <param name="linebreaks">the offsets at which to break the paragraph.</param>
+        /// <returns></returns>
         public int[] GetReordering(int[] linebreaks)
         {
             ValidateLineBreaks(linebreaks, _textLength);
@@ -1280,11 +1285,15 @@ namespace CodeArt.Bidi
             return ComputeMultilineReordering(levels, linebreaks);
         }
 
-        /**
-         * Return multiline reordering array for a given level array. Reordering
-         * does not occur across a line break.
-         */
+
         // ReSharper disable once SuggestBaseTypeForParameter
+        /// <summary>
+        ///  Return multiline reordering array for a given level array.Reordering
+        /// does not occur across a line break.
+        /// </summary>
+        /// <param name="levels"></param>
+        /// <param name="linebreaks"></param>
+        /// <returns></returns>
         private static int[] ComputeMultilineReordering(sbyte[] levels, int[] linebreaks)
         {
             var result = new int[levels.Length];
@@ -1310,11 +1319,11 @@ namespace CodeArt.Bidi
             return result;
         }
 
-        /**
-         * Return reordering array for a given level array. This reorders a single
-         * line. The reordering is a visual to logical map. For example, the
-         * leftmost char is string.charAt(order[0]). Rule L2.
-         */
+        /// <summary>
+        /// Return reordering array for a given level array. This reorders a single
+        /// line. The reordering is a visual to logical map. For example, the
+        /// leftmost char is string.charAt(order[0]). Rule L2.
+        /// </summary>
         private static int[] ComputeReordering(sbyte[] levels)
         {
             var lineLength = levels.Length;
@@ -1376,9 +1385,10 @@ namespace CodeArt.Bidi
             return result;
         }
 
-        /**
-         * Return the base level of the paragraph.
-         */
+        /// <summary>
+        /// Return the base level of the paragraph.
+        /// </summary>
+        /// <returns></returns>
         public sbyte GetBaseLevel()
         {
             return (sbyte)_paragraphEmbeddingLevel;
@@ -1386,10 +1396,10 @@ namespace CodeArt.Bidi
 
         // --- internal utilities -------------------------------------------------
 
-        /**
-         * Return true if the type is considered a whitespace type for the line
-         * break rules.
-         */
+        /// <summary>
+        /// Return true if the type is considered a whitespace type for the line
+        /// break rules.
+        /// </summary>
         private static bool IsWhitespace(BidiDirection biditype)
         {
             // ReSharper disable once SwitchStatementMissingSomeCases
@@ -1412,10 +1422,10 @@ namespace CodeArt.Bidi
             }
         }
 
-        /**
-         * Return true if the type is one of the types removed in X9.
-         * Made public so callers can duplicate the effect.
-         */
+        /// <summary>
+        /// Return true if the type is one of the types removed in X9.
+        /// Made public so callers can duplicate the effect.
+        /// </summary>
         public static bool IsRemovedByX9(BidiDirection biditype)
         {
             // ReSharper disable once SwitchStatementMissingSomeCases
@@ -1433,17 +1443,19 @@ namespace CodeArt.Bidi
             }
         }
 
-        /**
-         * Return the strong type (L or R) corresponding to the level.
-         */
+        /// <summary>Return the strong type (L or R) corresponding to the level.</summary>
         private static BidiDirection TypeForLevel(int level)
         {
             return (level & 0x1) == 0 ? L : R;
         }
 
-        /**
-         * Set levels from start up to (but not including) limit to newLevel.
-         */
+        /// <summary>
+        /// Set levels from start up to (but not including) limit to newLevel.
+        /// </summary>
+        /// <param name="levels"></param>
+        /// <param name="start"></param>
+        /// <param name="limit"></param>
+        /// <param name="newLevel"></param>
         private static void SetLevels(sbyte[] levels, int start, int limit, sbyte newLevel)
         {
             for (var i = start; i < limit; ++i)
@@ -1454,9 +1466,10 @@ namespace CodeArt.Bidi
 
         // --- input validation ---------------------------------------------------
 
-        /**
-         * Throw exception if type array is invalid.
-         */
+        /// <summary>
+        /// Throw exception if type array is invalid.
+        /// </summary>
+        /// <param name="types"></param>
         private static void ValidateTypes(BidiDirection[] types)
         {
             if (types == null)
@@ -1479,12 +1492,14 @@ namespace CodeArt.Bidi
             }
         }
 
-        /**
-         * Throw exception if paragraph embedding level is invalid. Special
-         * allowance for implicitEmbeddinglevel so that default processing of the
-         * paragraph embedding level as implicit can still be performed when
-         * using this API.
-         */
+
+        /// <summary>
+        /// Throw exception if paragraph embedding level is invalid.Special
+        /// allowance for implicitEmbeddinglevel so that default processing of the
+        /// paragraph embedding level as implicit can still be performed when
+        /// using this API.
+        /// </summary>
+        /// <param name="paragraphEmbeddingLevel"></param>
         private static void ValidateParagraphEmbeddingLevel(ParagraphDirection paragraphEmbeddingLevel)
         {
             if (paragraphEmbeddingLevel != ParagraphDirection.Default &&
@@ -1495,9 +1510,11 @@ namespace CodeArt.Bidi
             }
         }
 
-        /**
-         * Throw exception if line breaks array is invalid.
-         */
+        /// <summary>
+        /// Throw exception if line breaks array is invalid.
+        /// </summary>
+        /// <param name="linebreaks"></param>
+        /// <param name="textLength"></param>
         private static void ValidateLineBreaks(int[] linebreaks, int textLength)
         {
             var prev = 0;
@@ -1516,9 +1533,10 @@ namespace CodeArt.Bidi
             }
         }
 
-        /**
-         * Throw exception if _pairTypes array is invalid
-         */
+        /// <summary>
+        /// Throw exception if _pairTypes array is invalid
+        /// </summary>
+        /// <param name="pairTypes"></param>
         private static void ValidatePbTypes(BracketType[] pairTypes)
         {
             if (pairTypes == null)
@@ -1527,10 +1545,12 @@ namespace CodeArt.Bidi
             }
         }
 
-        /**
-         * Throw exception if _pairValues array is invalid or doesn't match _pairTypes in length
-         * Unfortunately there's little we can do in terms of validating the values themselves
-         */
+        /// <summary>
+        /// Throw exception if _pairValues array is invalid or doesn't match _pairTypes in length
+        /// Unfortunately there's little we can do in terms of validating the values themselves
+        /// </summary>
+        /// <param name="pairValues"></param>
+        /// <param name="pairTypes"></param>
         private static void ValidatePbValues(int[] pairValues, BracketType[] pairTypes)
         {
             if (pairValues == null)
@@ -1543,22 +1563,18 @@ namespace CodeArt.Bidi
             }
         }
 
-        /**
-         * static entry point for testing using several arrays of direction and other types and an externally supplied
-         * paragraph embedding level. The embedding level may be 0, 1 or 2.
-         * <p>
-         * 2 means to apply the default algorithm (rules P2 and P3), 0 is for LTR
-         * paragraphs, and 1 is for RTL paragraphs.
-         *
-         * @param types
-         *            the directional types array
-         * @param _pairTypes
-         *           the paired bracket types array
-         * @param _pairValues
-         * 			 the paired bracket values array
-         * @param _paragraphEmbeddingLevel
-         *            the externally supplied paragraph embedding level.
-         */
+        /// <summary>
+        /// static entry point for testing using several arrays of direction and other types and an externally supplied
+        /// paragraph embedding level.The embedding level may be 0, 1 or 2.
+        /// 
+        /// 2 means to apply the default algorithm (rules P2 and P3), 0 is for LTR
+        /// paragraphs, and 1 is for RTL paragraphs.
+        /// </summary>
+        /// <param name="types">the directional types array</param>
+        /// <param name="pairTypes"> the paired bracket types array</param>
+        /// <param name="pairValues">the paired bracket values array</param>
+        /// <param name="paragraphEmbeddingLevel">the externally supplied paragraph embedding level.</param>
+        /// <returns></returns>
         public static BidiReference AnalyzeInput(BidiDirection[] types, BracketType[] pairTypes, int[] pairValues, ParagraphDirection paragraphEmbeddingLevel)
         {
             var bidi = new BidiReference(types, pairTypes, pairValues, paragraphEmbeddingLevel);

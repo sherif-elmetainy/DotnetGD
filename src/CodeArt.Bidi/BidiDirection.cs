@@ -8,73 +8,73 @@ namespace CodeArt.Bidi
     /// </summary>
     public enum BidiDirection
     {
-        /** Left-to-right */
+        /// <summary> Left-to-right </summary>
         L = 0,
 
-        /** Left-to-Right Embedding */
+        /// <summary> Left-to-Right Embedding </summary>
         LRE = 1,
 
-        /** Left-to-Right Override */
+        /// <summary> Left-to-Right Override </summary>
         LRO = 2,
 
-        /** Right-to-Left */
+        /// <summary> Right-to-Left </summary>
         R = 3,
 
-        /** Right-to-Left Arabic */
+        /// <summary> Right-to-Left Arabic </summary>
         AL = 4,
 
-        /** Right-to-Left Embedding */
+        /// <summary> Right-to-Left Embedding </summary>
         RLE = 5,
 
-        /** Right-to-Left Override */
+        /// <summary> Right-to-Left Override </summary>
         RLO = 6,
 
-        /** Pop Directional Format */
+        /// <summary> Pop Directional Format </summary>
         PDF = 7,
 
-        /** European Number */
+        /// <summary> European Number </summary>
         EN = 8,
 
-        /** European Number Separator */
+        /// <summary> European Number Separator </summary>
         ES = 9,
 
-        /** European Number Terminator */
+        /// <summary> European Number Terminator </summary>
         ET = 10,
 
-        /** Arabic Number */
+        /// <summary> Arabic Number </summary>
         AN = 11,
 
-        /** Common Number Separator */
+        /// <summary> Common Number Separator </summary>
         CS = 12,
 
-        /** Non-Spacing Mark */
+        /// <summary> Non-Spacing Mark </summary>
         NSM = 13,
 
-        /** Boundary Neutral */
+        /// <summary> Boundary Neutral </summary>
         BN = 14,
 
-        /** Paragraph Separator */
+        /// <summary> Paragraph Separator </summary>
         B = 15,
 
-        /** Segment Separator */
+        /// <summary> Segment Separator </summary>
         S = 16,
 
-        /** Whitespace */
+        /// <summary> Whitespace </summary>
         WS = 17,
 
-        /** Other Neutrals */
+        /// <summary> Other Neutrals </summary>
         ON = 18,
 
-        /** Left-to-Right Isolate */
+        /// <summary> Left-to-Right Isolate </summary>
         LRI = 19,
 
-        /** Right-to-Left Isolate */
+        /// <summary> Right-to-Left Isolate </summary>
         RLI = 20,
 
-        /** First-Strong Isolate */
+        /// <summary> First-Strong Isolate </summary>
         FSI = 21,
 
-        /** Pop Directional Isolate */
+        /// <summary> Pop Directional Isolate </summary>
         PDI = 22,
 
         Unknown = -1,

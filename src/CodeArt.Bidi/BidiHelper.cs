@@ -20,6 +20,14 @@ namespace CodeArt.Bidi
         }
 
         private static readonly char[] LineBreakChars = {'\r', '\n'};
+
+        /// <summary>
+        /// Given an string, run the BidiAlgorithm 
+        /// and rearrange the characters within the string to display accoring to Bidi algorithm rules
+        /// </summary>
+        /// <param name="str">string</param>
+        /// <param name="dir">paragraph direction</param>
+        /// <returns>The string with characters rearranged.</returns>
         public static string FormatString(string str, ParagraphDirection dir)
         {
             var sb = new StringBuilder(str.Length);

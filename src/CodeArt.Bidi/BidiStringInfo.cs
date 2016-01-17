@@ -5,6 +5,10 @@ using System.Collections.Generic;
 
 namespace CodeArt.Bidi
 {
+    /// <summary>
+    /// Parses a string and gets data about character unicode bidi categories and bracket types 
+    /// To pass to the BidiAlgorithm
+    /// </summary>
     internal class BidiStringInfo
     {
         public BidiStringInfo(string str)

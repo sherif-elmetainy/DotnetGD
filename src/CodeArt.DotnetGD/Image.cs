@@ -20,7 +20,6 @@ namespace CodeArt.DotnetGD
     /// 
     /// So if you are going to use multiple threads to write to the image (very uncommon scenario), then locks must be used.
     /// A race condition can also occur when Disposing the Image in one thread and trying to read it in another thread.
-    /// 
     /// </summary>
     public sealed unsafe partial class Image : IDisposable
     {

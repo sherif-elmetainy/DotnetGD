@@ -26,10 +26,11 @@ namespace CodeArt.Bidi
             }
             else if (string.Equals(library.Type, "Assembly", StringComparison.OrdinalIgnoreCase))
             {
-                throw new InvalidOperationException("Cannot load unicod data.");
+                throw new InvalidOperationException("Cannot load unicode data.");
             }
             var dict = new Dictionary<int, long>();
             Debug.Assert(libraryPath != null, "libraryPath != null");
+            if (libraryPath == null) throw new InvalidOperationException("Cannot load unicode data.");
             using (var fs = File.OpenRead(Path.Combine(libraryPath, "Data", "Unicode.dat")))
             {
                 var binaryReader = new BinaryReader(fs);
