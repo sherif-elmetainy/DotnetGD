@@ -205,6 +205,17 @@ namespace CodeArt.DotnetGD
         }
 
         /// <summary>
+        /// Width of the image in inches
+        /// </summary>
+        public double WidthInches => (double)Width / ResolutionX;
+
+        /// <summary>
+        /// Height of the image in inches
+        /// </summary>
+        public double HeightInches => (double)Height / ResolutionY;
+
+
+        /// <summary>
         /// The inerpolation method to use when resizing an image.
         /// </summary>
         public InterpolationMethod InterpolationMethod
