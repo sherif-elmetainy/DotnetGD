@@ -269,7 +269,5 @@ namespace CodeArt.DotnetGD
             var y2 = Math.Max(rect.Bottom, other.Bottom);
             return new RectangleF(x1, y1, x2 - x1, y2 - y1);
         }
-
-
     }
 }

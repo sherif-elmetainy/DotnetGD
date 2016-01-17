@@ -23,7 +23,6 @@ namespace CodeArt.Bidi.Tests
 
         [Theory]
         [BidiTestData]
-        [InlineData("0028 0028 05D0 005B 05D1 0029 05D2 005D 05D3;1;1;1 1 1 1 1 1 1 1 1;8 7 6 5 4 3 2 1 0", 1)]
         public void RunBidiTest(string line, int lineNumber)
         {
             var split1 = line.Split(';');

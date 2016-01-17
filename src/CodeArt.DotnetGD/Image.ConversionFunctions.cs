@@ -124,7 +124,5 @@ namespace CodeArt.DotnetGD
         //        throw new ArgumentException("Other image has different size.", nameof(other));
         //    NativeWrappers.gdImageColorMatch(other.ImagePtr, ImagePtr);
         //}
-
-
     }
 }

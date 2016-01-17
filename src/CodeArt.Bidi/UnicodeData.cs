@@ -11,6 +11,9 @@ using System.Reflection;
 
 namespace CodeArt.Bidi
 {
+    /// <summary>
+    /// Get information about unicode characters
+    /// </summary>
     public static class UnicodeData
     {
         private static readonly Dictionary<int, long> Data = InitializeData();
@@ -52,6 +55,11 @@ namespace CodeArt.Bidi
             return dict;
         }
 
+        /// <summary>
+        /// Gets the unicode bidi category (direction) of a character
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <returns></returns>
         public static BidiDirection GetDirection(int ch)
         {
             long data;
@@ -59,8 +67,18 @@ namespace CodeArt.Bidi
             return (BidiDirection)UnicodeDataHelper.GetDirection(data);
         }
 
+        /// <summary>
+        /// Gets the unicode bidi category (direction) of a character
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <returns></returns>
         public static BidiDirection GetDirection(char ch) => GetDirection((int)ch);
 
+        /// <summary>
+        /// Get bracket type for a character
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <returns></returns>
         public static BracketType GetBracketType(int ch)
         {
             long data;
@@ -68,8 +86,18 @@ namespace CodeArt.Bidi
             return (BracketType)UnicodeDataHelper.GetBracketType(data);
         }
 
+        /// <summary>
+        /// Get bracket type for a character
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <returns></returns>
         public static BracketType GetBracketType(char ch) => GetBracketType((int)ch);
 
+        /// <summary>
+        /// Get the matching bracket character for a brachet character. if the character is not a bracket character, the character itself is returned.
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <returns></returns>
         public static int GetMatchingBracket(int ch)
         {
             long data;
@@ -77,8 +105,18 @@ namespace CodeArt.Bidi
             return data == 0 ? ch : UnicodeDataHelper.GetMatchingBracket(data);
         }
 
+        /// <summary>
+        /// Get the matching bracket character for a brachet character. if the character is not a bracket character, the character itself is returned.
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <returns></returns>
         public static int GetMatchingBracket(char ch) => GetMatchingBracket((int)ch);
 
+        /// <summary>
+        /// Get the mirror character of a character (for example the mirror character for [ is ])
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <returns></returns>
         public static int GetMirror(int ch)
         {
             long data;
@@ -86,13 +124,26 @@ namespace CodeArt.Bidi
             return data == 0 ? ch : UnicodeDataHelper.GetMirror(data);
         }
 
+        /// <summary>
+        /// Get the mirror character of a character (for example the mirror character for [ is ])
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <returns></returns>
         public static int GetMirror(char ch) => GetMirror((int)ch);
 
         public const int HiSurrogateStart = 0xD800;
         public const int LoSurrogateStart = 0xDC00;
         public const int SurrogateMask = 0xFC00;
+        /// <summary>
+        /// Minimum code point for a unicode characters having 2 words (2 16-bit chars)
+        /// </summary>
         public const int TwoWordCodepointStart = 0x10000;
 
+        /// <summary>
+        /// Write a 32-bit code point to a string
+        /// </summary>
+        /// <param name="sb"></param>
+        /// <param name="codepoint"></param>
         public static void WriteCodepoint(StringBuilder sb, int codepoint)
         {
             unchecked
@@ -113,6 +164,13 @@ namespace CodeArt.Bidi
 
         }
 
+        /// <summary>
+        /// Gets the 32-bit unicode code point of a string at a given index
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="index"></param>
+        /// <param name="wordCount">2 for characters whose UTF16 is represented as 2 words, 1 otherwise.</param>
+        /// <returns></returns>
         public static int GetUtf32(
             string str,
             int index,

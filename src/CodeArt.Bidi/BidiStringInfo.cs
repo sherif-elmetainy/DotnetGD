@@ -45,17 +45,34 @@ namespace CodeArt.Bidi
             LineBreaks = lbs.ToArray();
         }
 
-
+        /// <summary>
+        /// Bidi direction for all the characters in the string
+        /// </summary>
         public BidiDirection[] Types { get; }
 
+        /// <summary>
+        /// The original string
+        /// </summary>
         public string OriginalString { get; }
 
+        /// <summary>
+        /// 32 bit unicode code points of all characters in the string
+        /// </summary>
         public int[] Codes { get;  }
 
+        /// <summary>
+        /// Bracket type (closing, opening or none)
+        /// </summary>
         public BracketType[] BracketTypes { get; }
 
+        /// <summary>
+        /// 32 bit unicode Code points for bracket values
+        /// </summary>
         public int[] BracketValues { get; }
 
+        /// <summary>
+        /// indexes of line breaks in the string
+        /// </summary>
         public int[] LineBreaks { get; }
     }
 }

@@ -8,7 +8,6 @@ namespace CodeArt.DotnetGD.Tests
 {
     public class MatrixTests
     {
-        
         [Theory]
         [InlineData("Test_1.png")]
         public void ScaleAndRotate(string fileName)
@@ -79,7 +78,6 @@ namespace CodeArt.DotnetGD.Tests
             }
         }
 
-
         [Theory]
         [InlineData("Test_1.png")]
         public void DrawTransform(string fileName)
@@ -94,6 +92,5 @@ namespace CodeArt.DotnetGD.Tests
                 }
             }
         }
-
     }
 }

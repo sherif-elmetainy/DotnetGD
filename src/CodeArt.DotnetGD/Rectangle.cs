@@ -182,6 +182,5 @@ namespace CodeArt.DotnetGD
         /// <param name="r2"></param>
         /// <returns></returns>
         public static bool operator !=(Rectangle r1, Rectangle r2) => !r1.Equals(r2);
-
     }
 }

@@ -7,6 +7,11 @@ namespace CodeArt.DotnetGD
 {
     public partial class Image
     {
+        /// <summary>
+        /// Compares the image to another image
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public unsafe ImageCompareResult CompareTo(Image other)
         {
             if (other == null)
@@ -16,6 +21,12 @@ namespace CodeArt.DotnetGD
             return ReferenceEquals(this, other) ? ImageCompareResult.Similar : NativeWrappers.gdImageCompare(ImagePtr, other.ImagePtr);
         }
 
+        /// <summary>
+        /// Compares two images
+        /// </summary>
+        /// <param name="im1"></param>
+        /// <param name="im2"></param>
+        /// <returns></returns>
         public static ImageCompareResult CompareImages(Image im1, Image im2)
         {
             if (im1 == null && im2 == null)

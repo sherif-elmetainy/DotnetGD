@@ -114,7 +114,7 @@ namespace CodeArt.DotnetGD
         /// <param name="s"></param>
         /// <returns></returns>
         public static SizeF operator *(double scale, SizeF s) => new SizeF(scale * s.Width, scale * s.Height);
-        // <summary>
+        /// <summary>
         /// Multiplies a size by  scale (both width and height are multiplied)
         /// </summary>
         /// <param name="s"></param>
@@ -147,6 +147,5 @@ namespace CodeArt.DotnetGD
         /// <returns></returns>
         public static bool AreSimilar(SizeF s1, SizeF s2)
             => Math.Abs(s1.Width - s2.Width) < 1e-6 && Math.Abs(s1.Height - s2.Height) < 1e-6;
-
     }
 }

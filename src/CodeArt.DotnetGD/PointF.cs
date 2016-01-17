@@ -126,6 +126,5 @@ namespace CodeArt.DotnetGD
         /// <returns></returns>
         public static bool AreSimilar(PointF p1, PointF p2)
             => Math.Abs(p1.X - p2.X) < 1e-6 && Math.Abs(p1.Y - p2.Y) < 1e-6;
-
     }
 }

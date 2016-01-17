@@ -25,6 +25,5 @@ namespace CodeArt.DotnetGD.Tests
                 image.CompareToReferenceImage(effect.ToString());
             }
         }
-
     }
 }

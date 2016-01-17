@@ -78,7 +78,5 @@ namespace CodeArt.Bidi
             }
             return sb.ToString();
         }
-
-        
     }
 }

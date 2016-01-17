@@ -116,7 +116,5 @@ namespace CodeArt.DotnetGD.Tests
                 }
             }
         }
-
-
     }
 }

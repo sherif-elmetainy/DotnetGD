@@ -24,7 +24,6 @@
 * Distributed under the Terms of Use in http://www.unicode.org/copyright.html.
 */
 
-
 /*
  * Revision info (2013-09-16)
  * Changed MAX_DEPTH to 125

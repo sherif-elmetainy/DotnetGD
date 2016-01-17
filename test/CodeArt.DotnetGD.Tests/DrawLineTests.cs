@@ -80,6 +80,5 @@ namespace CodeArt.DotnetGD.Tests
                 }
             }
         }
-
     }
 }
