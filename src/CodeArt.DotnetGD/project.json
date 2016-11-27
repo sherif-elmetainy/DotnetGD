@@ -1,35 +1,31 @@
 ﻿{
-  "version": "1.0.0-alpha1",
+  "version": "1.0.0-alpha2",
   "description": "A managed wrapper around libgd to perform image reading and writing for ASP.NET 5 applications.",
   "authors": [ "Sherif Elmetainy (Code Art)" ],
-  "tags": [ "dotnetgd libgd drawing images aspnet5" ],
-  "projectUrl": "https://github.com/sherif-elmetainy/DotnetGD",
-  "licenseUrl": "https://github.com/sherif-elmetainy/DotnetGD/blob/master/LICENSE.txt",
   "copyright": "Copyright (c) 2015 Sherif Elmetainy (Code Art)",
   "dependencies": {
-    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0-rc1-final",
-    "CodeArt.Bidi": "1.0.0-*"
+    "CodeArt.Bidi": "1.0.0-*",
+    "System.Reflection.TypeExtensions": "4.3.0",
+    "System.Runtime.InteropServices": "4.3.0",
+    "Microsoft.Extensions.DependencyInjection": "1.1.0",
+    "Microsoft.Extensions.PlatformAbstractions": "1.1.0"
   },
   "frameworks": {
-    "dnx451": { },
-    "dnxcore50": {
-      "dependencies": {
-        "Microsoft.CSharp": "4.0.1-beta-23516",
-        "System.Collections": "4.0.11-beta-23516",
-        "System.Linq": "4.0.1-beta-23516",
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.Threading": "4.0.11-beta-23516",
-        "System.IO.FileSystem": "4.0.1-beta-23516",
-        "System.Reflection": "4.1.0-beta-23516"
-      }
-    }
+    "netstandard1.6": {}
   },
-  "compilationOptions": {
+  "buildOptions": {
     "allowUnsafe": true
   },
-  "packInclude": {
-    "runtimes/win7-x64/native/": "runtimes/win7-x64/native/*",
-    "runtimes/win7-x86/native/": "runtimes/win7-x86/native/*",
-    "runtimes/osx/native/": "runtimes/osx/native/*"
+  "packOptions": {
+    "files": {
+      "mappings": {
+        "runtimes/win7-x64/native/": "runtimes/win7-x64/native/*",
+        "runtimes/win7-x86/native/": "runtimes/win7-x86/native/*",
+        "runtimes/osx/native/": "runtimes/osx/native/*"
+      }
+    },
+    "tags": [ "dotnetgd libgd drawing images aspnet5" ],
+    "projectUrl": "https://github.com/sherif-elmetainy/DotnetGD",
+    "licenseUrl": "https://github.com/sherif-elmetainy/DotnetGD/blob/master/LICENSE.txt"
   }
 }

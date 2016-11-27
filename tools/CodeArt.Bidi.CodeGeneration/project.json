@@ -1,39 +1,33 @@
 ﻿{
-  "version": "1.0.0-alpha1",
+  "version": "1.0.0-alpha2",
   "description": "A file generation tool to generate unicode data files for CodeArt.Bidi library.",
   "authors": [ "Sherif Elmetainy (Code Art)" ],
-  "tags": [ "unicode bidi arabic" ],
-  "projectUrl": "https://github.com/sherif-elmetainy/DotnetGD",
-  "licenseUrl": "https://github.com/sherif-elmetainy/DotnetGD/blob/master/LICENSE.txt",
-  "copyright": "Copyright (c) 2015 Sherif Elmetainy (Code Art)",
-  "compilationOptions": {
+  "packOptions": {
+    "tags": [ "unicode bidi arabic" ],
+    "projectUrl": "https://github.com/sherif-elmetainy/DotnetGD",
+    "licenseUrl": "https://github.com/sherif-elmetainy/DotnetGD/blob/master/LICENSE.txt",
+    "copyright": "Copyright (c) 2015 Sherif Elmetainy (Code Art)"
+  },
+  "buildOptions": {
+    "compile": [
+      "../../src/CodeArt.Bidi/UnicodeDataHelper.cs",
+      "../../src/CodeArt.Bidi/BidiDirection.cs",
+      "../../src/CodeArt.Bidi/BracketType.cs"
+    ],
+    "embed": ["*.txt"],
     "emitEntryPoint": true
   },
-
   "dependencies": {
-    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc1-final"
+    "Microsoft.Extensions.PlatformAbstractions": "1.1.0"
   },
-
-  "commands": {
-    "CodeArt.Bidi.CodeGeneration": "CodeArt.Bidi.CodeGeneration"
-  },
-
   "frameworks": {
-    "dnx451": { },
-    "dnxcore50": {
+    "netcoreapp1.1": {
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-beta-23516",
-        "System.Collections": "4.0.11-beta-23516",
-        "System.Console": "4.0.0-beta-23516",
-        "System.Text.RegularExpressions": "4.0.11-beta-23516",
-        "System.IO.FileSystem": "4.0.1-beta-23516"
-        
+        "Microsoft.NETCore.App": {
+          "version": "1.1.0",
+          "type": "platform"
+        }
       }
     }
-  },
-  "compileFiles": [
-    "../../src/CodeArt.Bidi/UnicodeDataHelper.cs",
-    "../../src/CodeArt.Bidi/BidiDirection.cs",
-    "../../src/CodeArt.Bidi/BracketType.cs"
-  ]
+  }
 }

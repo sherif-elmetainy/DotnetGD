@@ -1,12 +1,9 @@
 ﻿// Copyright (c) Sherif Elmetainy (Code Art). 
 // Licensed under the MIT License, See License.txt in the repository root for license information.
 
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
-using Microsoft.Extensions.PlatformAbstractions;
 using System.Reflection;
 
 namespace CodeArt.Bidi
@@ -20,21 +17,9 @@ namespace CodeArt.Bidi
 
         private static Dictionary<int, long> InitializeData()
         {
-            var name = typeof(UnicodeData).GetTypeInfo().Assembly.GetName().Name;
-            var library = PlatformServices.Default.LibraryManager.GetLibrary(name);
-            var libraryPath = library.Path;
-            if (string.Equals(library.Type, "Project", StringComparison.OrdinalIgnoreCase))
-            {
-                libraryPath = Path.GetDirectoryName(libraryPath);
-            }
-            else if (string.Equals(library.Type, "Assembly", StringComparison.OrdinalIgnoreCase))
-            {
-                throw new InvalidOperationException("Cannot load unicode data.");
-            }
+            var assembly = typeof(UnicodeData).GetTypeInfo().Assembly;
             var dict = new Dictionary<int, long>();
-            Debug.Assert(libraryPath != null, "libraryPath != null");
-            if (libraryPath == null) throw new InvalidOperationException("Cannot load unicode data.");
-            using (var fs = File.OpenRead(Path.Combine(libraryPath, "Data", "Unicode.dat")))
+            using (var fs = assembly.GetManifestResourceStream($"{typeof(UnicodeData).Namespace}.Data.Unicode.dat"))
             {
                 var binaryReader = new BinaryReader(fs);
                 do

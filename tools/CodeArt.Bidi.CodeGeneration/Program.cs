@@ -5,6 +5,8 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.PlatformAbstractions;
 
@@ -19,6 +21,7 @@ namespace CodeArt.Bidi.CodeGeneration
         private static readonly Regex BidiBracketsRegex = new Regex(@"^(?<k>[a-fA-F0-9]{4});\s+(?<v>[a-fA-F0-9]{4});\s+(?<t>o|c)");
         private static readonly Regex MirrorRegex = new Regex(@"^(?<k>[a-fA-F0-9]{4});\s+(?<v>[a-fA-F0-9]{4})");
         private static readonly Regex UnicodeDataRegex = new Regex(@"^(?<cp>[a-fA-F0-9]{4,6});(?<n>[^;]*);[^;]*;[^;]*;(?<bd>[^;]*);");
+
         public static void Main(string[] args)
         {
             var data = new long[UnicodeDataHelper.MaximumUnicodeCodePoint];
@@ -48,15 +51,14 @@ namespace CodeArt.Bidi.CodeGeneration
         {
             var appPath = PlatformServices.Default.Application.ApplicationBasePath;
             var currentDir = new DirectoryInfo(appPath);
-            Debug.Assert(currentDir.Parent != null, "currentDir.Parent != null");
-            Debug.Assert(currentDir.Parent.Parent != null, "currentDir.Parent.Parent != null");
-            return Path.Combine(currentDir.Parent.Parent.FullName, "src", Namespace, "Data");
+            return Path.Combine(currentDir.FullName, "..", "..", "..", "..", "..", "src", Namespace, "Data");
         }
 
         private static StreamReader OpenDataFile(string name)
         {
-            var appPath = PlatformServices.Default.Application.ApplicationBasePath;
-            return File.OpenText(Path.Combine(appPath, name));
+            var assembly = typeof(Program).GetTypeInfo().Assembly;
+            var stream = assembly.GetManifestResourceStream($"{typeof(Program).Namespace}.{name}");
+            return new StreamReader(stream, Encoding.UTF8, true, 4096, false);
         }
 
         // ReSharper disable once SuggestBaseTypeForParameter

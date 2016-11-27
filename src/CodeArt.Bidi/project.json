@@ -1,28 +1,22 @@
 ﻿{
-  "version": "1.0.0-alpha1",
-  "description": "A class library to handle the rendering of right to left languages such as Arabic. It is used by CodeArt.DotnetGD to render RTL text as images.",
   "authors": [ "Sherif Elmetainy (Code Art)" ],
-  "tags": [ "bidi arabic dotnetgd" ],
-  "projectUrl": "https://github.com/sherif-elmetainy/DotnetGD",
-  "licenseUrl": "https://github.com/sherif-elmetainy/DotnetGD/blob/master/LICENSE.txt",
-  "copyright": "Copyright (c) 2015 Sherif Elmetainy (Code Art)",
   "dependencies": {
-    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc1-final"
+    "System.Linq": "4.3.0",
+    "System.Reflection": "4.3.0",
+    "System.Runtime.Extensions": "4.3.0"
   },
+  "description": "A class library to handle the rendering of right to left languages such as Arabic. It is used by CodeArt.DotnetGD to render RTL text as images.",
   "frameworks": {
-    "dnx451": {
-    },
-    "dnxcore50": {
-      "dependencies": {
-        "Microsoft.CSharp": "4.0.1-beta-23516",
-        "System.Collections": "4.0.11-beta-23516",
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.Globalization": "4.0.11-beta-23516",
-        "System.IO.FileSystem": "4.0.1-beta-23516"
-      }
-    }
+    "netstandard1.6": {}
   },
-  "packInclude": {
-    "Data/": "Data/*"
+  "packOptions": {
+    "licenseUrl": "https://github.com/sherif-elmetainy/DotnetGD/blob/master/LICENSE.txt",
+    "tags": [ "bidi arabic dotnetgd" ],
+    "projectUrl": "https://github.com/sherif-elmetainy/DotnetGD",
+    "copyright": "Copyright (c) 2015 Sherif Elmetainy (Code Art)"
+  },
+  "version": "1.0.0-alpha2",
+  "buildOptions": {
+    "embed": ["Data/*"]
   }
 }

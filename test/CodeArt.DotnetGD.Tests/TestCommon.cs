@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using CodeArt.DotnetGD.Formatters;
 using Microsoft.Extensions.PlatformAbstractions;
 using Xunit;
@@ -44,35 +45,35 @@ namespace CodeArt.DotnetGD.Tests
         internal static Image GetTestImage(string name)
         {
             var basePath = PlatformServices.Default.Application.ApplicationBasePath;
-            var imagePath = Path.Combine(basePath, "TestImages", name);
+            var imagePath = Path.Combine(basePath, "..", "..", "..", "TestImages", name);
             return ImageFormatter.ReadImageFromFile(imagePath);
         }
 
-        public static string GetRuntimeId(this IRuntimeEnvironment env)
+        public static string GetRuntimeId()
         {
-            var os = env.OperatingSystem ?? string.Empty;
-            if (string.Equals(os, "Windows", StringComparison.OrdinalIgnoreCase))
+            string os = "";
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 os = "win";
             }
-            else if (string.Equals(os, "Darwin", StringComparison.OrdinalIgnoreCase))
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 os = "osx";
             }
-            else if (string.Equals(os, "Linux", StringComparison.OrdinalIgnoreCase))
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                var ver = env.OperatingSystemVersion ?? string.Empty;
+                var ver = RuntimeInformation.OSDescription;
                 var split = ver.Split(new[] { ' ' }, 2);
                 os = split.Length == 2 ? split[0].ToLowerInvariant() : "linux";
             }
-            return os + "_" + env.RuntimeArchitecture.ToLowerInvariant();
+            return os + "_" + RuntimeInformation.OSArchitecture.ToString();
         }
 
         private static void CompareToReferenceImageInternal(Image image, string referenceImage)
         {
             var basePath = PlatformServices.Default.Application.ApplicationBasePath;
             var formatter = new PngImageFormatter();
-            var imagePath = Path.Combine(basePath, "ReferenceImages", GetRuntimeId(PlatformServices.Default.Runtime), Path.ChangeExtension(referenceImage, formatter.DefaultExtension));
+            var imagePath = Path.Combine(basePath, "ReferenceImages", GetRuntimeId(), Path.ChangeExtension(referenceImage, formatter.DefaultExtension));
 
             if (!File.Exists(imagePath))
             {
